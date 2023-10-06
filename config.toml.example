@@ -1,0 +1,43 @@
+config_version = 1
+
+[general]
+
+# Listening address
+# use 0.0.0.0 as a wildcard IPv4 address
+# use 127.0.0.1 to only listen local IPv4 connections
+listening_address = "127.0.0.1"
+
+# Listening port, between 1 and 65535.
+# Ports below 1024 will require additional privileges.
+listening_port = 8888
+
+# Your website hostname.
+hostname = "constellation.lacontrevoie.fr"
+
+# The database URL
+# Backend only supports postgres but other DB support can be
+# easily implemented if needed
+database_url = "./db.sqlite"
+
+[mail]
+
+# Email address that receives contact forms
+contact_form_dest = "forms-address@example.org"
+
+# Mailserver's FQDN
+external_address = "mail.example.org"
+
+# The email used for SMTP authentication
+sender_email = "mailer-account@example.org"
+
+# The password used for SMTP authentication
+sender_password = "mailer password"
+
+# The email address to use in the From field when sending emails
+send_as = "postmaster@example.org"
+
+# The name to use in the From field when sending emails
+sender_name = "Your Org Name"
+
+# Your organisation's contact address (in Reply-To header)
+contact_address = "contact@example.org"
