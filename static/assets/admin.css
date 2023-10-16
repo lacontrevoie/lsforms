@@ -1,0 +1,39 @@
+
+body {
+    font-family: 'Contre-Aller', Ubuntu, sans-serif;
+    margin: 0;
+}
+
+@font-face {
+    font-family: 'Contre-Aller';
+    src: url('/assets/Contre-Aller.woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.title {
+    text-align: center;
+}
+
+.trans-table {
+    min-width: 800px;
+    width: 80%;
+    margin: auto;
+}
+
+.trans-table, .trans-table th, .trans-table td {
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.trans-table th, .trans-table td {
+    padding: 4px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #444;
+}
+
+tr.tr-row.is_checked td {
+    background-color: #b9ffb9;
+    color: gray;
+}

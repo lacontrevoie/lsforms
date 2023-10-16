@@ -1,9 +1,7 @@
 use crate::config::global::{CONFIG_VERSION, CONFIG_FILE, CONFIG, STARS, STARS_FILE};
 use crate::config::structs::{Config, Stars};
 
-use std::collections::HashMap;
 use std::fs::File;
-use std::fmt;
 use std::io::Read;
 
 // Initialize CONFIG

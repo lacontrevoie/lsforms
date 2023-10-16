@@ -1,24 +1,24 @@
 [
     {
-        "id": 1,
+        "startype": 1,
         "path": "/stars/small-stars/01.svg",
         "price": 5,
         "size_pct": 25
     },
     {
-        "id": 2,
+        "startype": 2,
         "path": "/stars/small-stars/02.svg",
         "price": 5,
         "size_pct": 30
     },
     {
-        "id": 3,
+        "startype": 3,
         "path": "/stars/small-stars/03.svg",
         "price": 5,
         "size_pct": 30
     },
     {
-        "id": 4,
+        "startype": 4,
         "path": "/stars/small-stars/04.svg",
         "price": 10,
         "size_pct": 65

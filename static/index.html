@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="preload" as="style" href="/assets/index.css">
+        <link rel="stylesheet" href="/assets/index.css">
+        <script src="/assets/global.js"></script>
+        <script src="/assets/index.js"></script>
+    </head>
+    <body>
+        <div class="header">
+            <div class="header-title">
+                <h1>Constellation participative</h1>
+                <span>Donnez à La Contre-Voie et créez une étoile ! ✨</span>
+            </div>
+            <div class="header-info">
+                <div id="gem-counter" class="header-data"></div>
+                <a id="star-send-button" href="https://www.helloasso.com/associations/la-contre-voie/formulaires/1" class="button">Donner à La Contre-Voie</a>
+            </div>
+        </div>
+        <div class="canvas edit">
+            <div class="sky-background sky-full"></div>
+            <div class="sky-defaultconstel sky-full"></div>
+            <div class="sky-clouds"></div>
+            <div id="star-canvas" class="star-canvas sky-full"></div>
+            <div id="mouse-tooltip-globalstar" class="globalstar-tooltip mouse-tooltip opacity-hidden"></div>
+        </div>
+        <div class="sky-right-offset"></div>
+        <div class="sky-bottom-offset"></div>
+        <div id="mouse-tooltip-ownstar" class="mouse-tooltip hidden"></div>
+        <div id="star-selector" class="hidden star-selector">
+            <div class="star-tabs">
+                <div class="star-tabs left">
+                    <!-- <div id="tab-1" class="star-tab active">Petites étoiles</div>
+                    <div id="tab-2" class="star-tab">Grandes étoiles</div>
+                    <div id="tab-3" class="star-tab">Comètes</div>
+                    <div id="tab-4" class="star-tab">Planètes</div>
+                    <div id="tab-5" class="star-tab">Objets</div> -->
+                </div>
+                <div class="star-tabs right">
+                    <div id="star-selector-toggler" class="star-tab">▼</div>
+                </div>
+            </div>
+            <div class="star-content">
+                <!-- Provisioned by JS -->
+                <div id="tab-1-content" class="star-content-inner">
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

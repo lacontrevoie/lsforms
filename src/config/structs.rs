@@ -1,11 +1,9 @@
-use std::collections::HashMap;
-
 #[derive(Serialize, Deserialize)]
 pub struct Stars(pub Vec<StarsList>);
 
 #[derive(Serialize, Deserialize)]
 pub struct StarsList {
-    pub id: i32,
+    pub startype: i32,
     pub path: String,
     pub price: u16,
     pub size_pct: u8,
@@ -30,9 +28,17 @@ pub struct ConfMail {
     pub contact_address: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct ConfHelloAsso {
+    pub callback_key: String,
+    pub field_username: String,
+    pub field_message: String,
+}
+
 #[derive(Deserialize)]
 pub struct Config {
     pub config_version: u8,
     pub general: ConfGeneral,
     pub mail: ConfMail,
+    pub helloasso: ConfHelloAsso,
 }

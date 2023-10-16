@@ -1,4 +1,4 @@
-use actix_web::{error, http::StatusCode, http::header::ContentType, HttpResponseBuilder, HttpRequest, HttpResponse};
+use actix_web::{error, http::StatusCode, http::header::ContentType, HttpResponseBuilder, HttpResponse};
 use std::fmt;
 use std::fmt::Debug;
 
@@ -12,30 +12,34 @@ pub enum ErrorKind {
     // critical errors: 0 -> 99
     DbPool = 0,
     DbFail,
-    LinkDeleteDbFail,
-    AwaitFail,
+    CallbackParseFail,
+    CallbackReadFail,
+    //LinkDeleteDbFail,
+    //AwaitFail,
     // warn errors: 100 -> 199
-    BadServerAdminKey = 100,
-    BlockedLinkShortener,
-    BlockedLinkSpam,
-    BlockedLinkFreehost,
-    BlockedName,
-    CaptchaFail,
+    CallbackKeyInvalid = 100,
+    //BadServerAdminKey = 100,
+    //BlockedLinkShortener,
+    //BlockedLinkSpam,
+    //BlockedLinkFreehost,
+    //BlockedName,
+    //CaptchaFail,
     // notice errors: 200 -> 299
-    UnsupportedProtocol = 200,
-    LinkAlreadyExists,
-    InvalidKey,
-    NotManagingPhishing,
-    NotDeletingPhishing,
-    CookieParseFail,
+    //UnsupportedProtocol = 200,
+    //LinkAlreadyExists,
+    //InvalidKey,
+    //NotManagingPhishing,
+    //NotDeletingPhishing,
+    //CookieParseFail,
     // info errors: 300 -> 399
-    LinkNotFound = 300,
-    InvalidUrlFrom,
-    InvalidUrlTo,
-    InvalidLink,
-    SelflinkForbidden,
-    NotFound,
-    PhishingLinkReached,
+    TransactionExists = 300,
+    //LinkNotFound = 300,
+    //InvalidUrlFrom,
+    //InvalidUrlTo,
+    //InvalidLink,
+    //SelflinkForbidden,
+    //NotFound,
+    //PhishingLinkReached,
 }
 
 pub enum ErrorSeverity {

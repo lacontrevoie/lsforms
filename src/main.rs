@@ -2,7 +2,6 @@
 
 #[macro_use]
 extern crate serde_derive;
-#[macro_use]
 extern crate diesel;
 
 extern crate diesel_migrations;
@@ -11,15 +10,17 @@ mod config;
 mod errors;
 mod db;
 mod handlers;
+mod webmodels;
 
 use diesel::prelude::*;
-use diesel::r2d2::{self, ConnectionManager};
+use diesel::r2d2::{self, ConnectionManager, PooledConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use actix_web::{App, HttpServer, web::Data, web};
+use actix_web::{App, HttpServer, web::Data};
 use actix_files::Files;
 
-use crate::handlers::stars::{helloworld};
-use crate::handlers::callbacks::{callback_helloasso};
+use crate::handlers::stars::*;
+use crate::handlers::callbacks::*;
+use crate::handlers::transactions::*;
 use crate::config::global::CONFIG;
 use crate::config::structs::Config;
 use crate::config::methods::{read_config};
@@ -32,6 +33,7 @@ type DbConn = SqliteConnection;
 type DB = diesel::sqlite::Sqlite;
 
 type DbPool = r2d2::Pool<ConnectionManager<DbConn>>;
+type PooledDbConn = PooledConnection<ConnectionManager<DbConn>>;
 
 fn run_migrations(
     connection: &mut impl MigrationHarness<DB>,
@@ -68,16 +70,24 @@ async fn main() -> std::io::Result<()> {
 
     // starting the http server
     println!(
-        "Server listening at {}",
-        CONFIG.wait().general.listening_address
+        "Server listening at {}:{}",
+        CONFIG.wait().general.listening_address, CONFIG.wait().general.listening_port
     );
 
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(pool.clone()))
-            .service(helloworld)
+            .service(get_stars_own)
+            .service(post_stars_own)
+            .service(get_stars_global)
             .service(callback_helloasso)
-            //.service(Files::new("/", "./static/").index_file("index.html"))
+            .service(get_transaction)
+            .service(put_transaction)
+            .service(patch_transaction)
+            .service(delete_transaction)
+            .service(post_transaction_toggle_check)
+            .service(post_transaction_send_mail)
+            .service(Files::new("/", "./static/").index_file("index.html"))
             //.service(Files::new("/assets", "./assets"))
             //.default_service(web::to(default_handler))
     })

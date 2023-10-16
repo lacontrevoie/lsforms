@@ -1,20 +1,24 @@
 diesel::table! {
-    transactions (id) {
+    transaction (id) {
         id -> Integer,
-        username -> Nullable<Text>,
-        message -> Nullable<Text>,
+        username -> Text,
+        message -> Text,
         email -> Text,
-        time -> Timestamp,
+        day -> Date,
         amount -> Integer,
         gems -> Integer,
         token -> Text,
+        ha_id -> Integer,
+        receipt_url -> Text,
+        event_type -> Integer,
         is_mail_sent -> Bool,
         is_token_used -> Bool,
+        is_checked -> Bool,
     }
 }
 
 diesel::table! {
-    stars (id) {
+    star (id) {
         id -> Integer,
         startype -> Integer,
         position_x -> Float,
@@ -23,9 +27,9 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(stars -> transactions (transactionid));
+diesel::joinable!(star -> transaction (transactionid));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    stars,
-    transactions,
+    star,
+    transaction,
 );
