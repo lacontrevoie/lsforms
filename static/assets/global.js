@@ -1,8 +1,19 @@
 async function fetchData(filename, fn_results, method = "GET", body = null) {
-    await fetch(filename, {
-        method: method,
-        body: body,
-    })
+    let options;
+    if (body == null) {
+        options = {
+            method: method,
+        };
+    } else {
+        options = {
+            method: method,
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+    }
+    await fetch(filename, options)
         .then(function (response) {
             return response.json();
         })

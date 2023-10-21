@@ -35,8 +35,17 @@ pub struct PublicStar {
     pub startype: i32,
     pub day: NaiveDate,
     pub username: String,
+    pub message: String,
     pub position_x: f32,
     pub position_y: f32,
+}
+
+#[derive(Serialize, Deserialize, Queryable)]
+pub struct OwnStarWithId {
+    pub id: i32,
+    pub username: String,
+    pub message: String,
+    pub gems: i32,
 }
 
 #[derive(Serialize, Deserialize, Queryable)]

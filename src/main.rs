@@ -7,6 +7,7 @@ extern crate diesel;
 extern crate diesel_migrations;
 
 mod config;
+mod emails;
 mod errors;
 mod db;
 mod handlers;
@@ -87,6 +88,7 @@ async fn main() -> std::io::Result<()> {
             .service(delete_transaction)
             .service(post_transaction_toggle_check)
             .service(post_transaction_send_mail)
+            .service(get_email_templates)
             .service(Files::new("/", "./static/").index_file("index.html"))
             //.service(Files::new("/assets", "./assets"))
             //.default_service(web::to(default_handler))

@@ -1,5 +1,6 @@
 use crate::config::global::{CONFIG_VERSION, CONFIG_FILE, CONFIG, STARS, STARS_FILE};
 use crate::config::structs::{Config, Stars};
+use crate::errors::{ErrorKind, ServerError, throw};
 
 use std::fs::File;
 use std::io::Read;
@@ -18,7 +19,7 @@ pub fn read_config() {
 
 impl Config {
     pub fn init() -> Self {
-        toml::from_str(&init_from_file(CONFIG_FILE)).unwrap()
+        toml::from_str(&init_from_file(CONFIG_FILE).unwrap()).unwrap()
     }
 
     pub fn global() -> &'static Config {
@@ -34,24 +35,24 @@ impl Config {
     }
 }
 
-fn init_from_file(filename: &'static str) -> String {
-    let mut conffile = File::open(filename).expect(&format!(
-        r#"File {} not found. This software will now exit."#,
-        filename
-    ));
+pub fn init_from_file(filename: &str) -> Result<String, ServerError> {
+    let mut conffile = File::open(filename).map_err(|e| {
+        throw(ErrorKind::FileNotFound, e.to_string())
+    })?;
+
     let mut confstr = String::new();
     conffile
         .read_to_string(&mut confstr)
-        .expect(&format!(
-                "Couldn't read {} to string",
-                filename
-        ));
-    confstr
+        .map_err(|e| {
+            throw(ErrorKind::FileReadFail, e.to_string())
+        })?;
+
+    Ok(confstr)
 }
 
 impl Stars {
     pub fn init() -> Self {
-        serde_json::from_str(&init_from_file(STARS_FILE)).unwrap()
+        serde_json::from_str(&init_from_file(STARS_FILE).unwrap()).unwrap()
     }
     pub fn global() -> &'static Stars {
         STARS.get().expect("Stars not initialized?!")

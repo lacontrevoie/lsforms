@@ -9,7 +9,6 @@ use crate::db::schema::*;
 #[derive(Copy, Clone)]
 pub enum EventType {
     OrderMembership = 0,
-    OrderMembershipAndDonation,
     OrderDonation,
     OrderUnknown,
     PaymentMonthlyDonation,

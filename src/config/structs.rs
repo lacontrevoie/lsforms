@@ -19,13 +19,18 @@ pub struct ConfGeneral {
 
 #[derive(Serialize, Deserialize)]
 pub struct ConfMail {
-    pub contact_form_dest: String,
-    pub external_address: String,
+    pub mailserver_address: String,
     pub sender_email: String,
     pub sender_password: String,
     pub send_as: String,
-    pub sender_name: String,
-    pub contact_address: String,
+    pub templates: Vec<MailTemplate>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MailTemplate {
+    pub id: i32,
+    pub name: String,
+    pub path: String,
 }
 
 #[derive(Serialize, Deserialize)]

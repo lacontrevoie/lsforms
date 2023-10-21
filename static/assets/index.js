@@ -3,7 +3,9 @@ let star_edit_mode = false;
 
 let api_global_stars = [];
 let api_own_stars = {};
+let api_own_stars_result = {};
 let data_stars = [];
+let startoken = null;
 
 window.onload = async function() {
     // First load stars
@@ -13,7 +15,7 @@ window.onload = async function() {
 
     // check if the user is about to place their stars
     let params = new URLSearchParams(document.location.search);
-    let startoken = params.get("token");
+    startoken = params.get("token");
     if (startoken != null) {
         // get gem data
         let get_url = `/api/stars/own?token=${startoken}`;
@@ -33,15 +35,60 @@ window.onload = async function() {
         await updateGemCounter();
 
         get("star-send-button").innerHTML = "Envoyer vos étoiles ✨"
-        get("star-send-button").href = "";
+        get("star-send-button").removeAttribute("href");
         get("star-send-button").addEventListener('click', sendStars);
+        get("star-confirm-cancel").addEventListener('click', cancelStarSend);
+        get("star-confirm-send").addEventListener('click', confirmStarSend);
+        get("send-box-username").value = api_own_stars.username;
+        get("send-box-message").value = api_own_stars.message;
+        get("tutorial").classList.remove("hidden");
+    }
+
+}
+
+function cancelStarSend() {
+    get("send-box-modal").classList.add("hidden");
+}
+
+async function confirmStarSend() {
+    let sendbutton = get("star-confirm-send");
+
+    sendbutton.classList.add("in-progress");
+    sendbutton.innerHTML = "Envoi…";
+
+    // defining OwnTokenPost webmodel
+    let jsondata = {};
+    jsondata["token"] = startoken;
+    jsondata["username"] = escapeHTML(get("send-box-username").value);
+    jsondata["message"] = escapeHTML(get("send-box-message").value);
+    jsondata["stars"] = [];
+
+    // collect all stars
+    let star_list_elem = document.getElementsByClassName("own-canvas");
+
+    for (let i = 0; i < star_list_elem.length; i++) {
+        let newstarpost = {};
+        newstarpost["startype"] = parseInt(star_list_elem[i].dataset.startype);
+        newstarpost["position_x"] = parseFloat(star_list_elem[i].style.left.replace('%', ""));
+        newstarpost["position_y"] = parseFloat(star_list_elem[i].style.top.replace('%', ""));
+        jsondata["stars"].push(newstarpost);
+    }
+
+    await fetchData(
+        "/api/stars/own",
+        function(d) { api_own_stars_result = d; },
+        "POST",
+        jsondata,
+    );
+
+    if (api_own_stars_result.code != undefined && api_own_stars_result.code == 1001) {
+        window.location = "/";
     }
 
 }
 
 async function sendStars() {
-    let btn = get("star-send-button");
-
+    get("send-box-modal").classList.remove("hidden");
 }
 
 
@@ -82,7 +129,6 @@ function putStar(stardata, isOwn) {
         new_star.classList.add("own-canvas");
         // add function to remove ownstar by clicking on it
         new_star.addEventListener("click", () => { e_click_ownstar(new_star)});
-        // add color on ownstars
     } else {
         new_star.classList.add("global-canvas");
         // add globalstar tooltip
@@ -92,6 +138,7 @@ function putStar(stardata, isOwn) {
 
     let starinfo = data_stars.find(star => star.startype == stardata.startype);
     new_star.dataset.price = starinfo.price;
+    new_star.dataset.startype = starinfo.startype;
     new_star.src = starinfo.path;
     new_star.style.left = `${stardata.position_x}%`;
     new_star.style.top = `${stardata.position_y}%`;
@@ -127,7 +174,12 @@ function e_mouseenter_globalstar(stardata) {
         tooltip.style.left = `calc(${stardata.position_x}% + 20px)`;
     }
     tooltip.style.top = `calc(${stardata.position_y}% + 20px)`;
-    tooltip.innerHTML = `<div class="star-username">${stardata.username}</div><div class="star-date">${stardata.day}</div>`;
+    let day = new Date(stardata.day);
+    let day_fmt = day.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    tooltip.innerHTML = `
+    <div class="star-username">${(stardata.username.length == 0 ? "Anonyme" : stardata.username)}</div>
+    <div class="star-date">le ${day_fmt}</div>
+    ${stardata.message.length == 0 ? "" : `<div class="star-message">«&nbsp;${stardata.message}&nbsp;»</div>`}`;
     if (tooltip.classList.contains("opacity-hidden")) {
         tooltip.classList.remove("opacity-hidden");
     }
@@ -176,6 +228,8 @@ function disable_star_edit() {
     own_canvas.classList.remove("edit-mode");
     tooltip_star.classList.add("hidden");
     tooltip_star.removeAttribute("data-name");
+    tooltip_star.removeAttribute("data-startype");
+    tooltip_star.removeAttribute("data-price");
     own_canvas.removeEventListener('mousemove', e_follow_star);
     tooltip_star.innerHTML = ``;
     star_edit_mode = false;
@@ -204,10 +258,10 @@ function e_hold_star() {
 
     if (tooltip_star.dataset.startype == null) {
         own_canvas.classList.add("edit-mode");
-        star_edit_mode = true;
     } else {
         clear_selected_stars();
     }
+    star_edit_mode = true;
     this.classList.add("selected");
 
     // if another star is clicked while in edit mode: replace star
@@ -220,7 +274,6 @@ function e_hold_star() {
     tooltip_star.appendChild(tooltip_img);
     tooltip_star.style.width = `calc(4% * ${this.dataset.size_pct / 100})`
     tooltip_star.style.height = `calc(4% * ${this.dataset.size_pct / 100})`
-
     
     // listen on star placements in edit mode
     own_canvas.addEventListener('mousemove', function(e) { e_follow_star(e, tooltip_star) });
@@ -239,11 +292,25 @@ function e_follow_star(e, tooltip) {
         tooltip.style.left = (e.pageX + 10) + 'px';
     }
     tooltip.style.top = (e.pageY + 10) + 'px';
+
+    // if dropping the star would cause a canvas overflow,
+    // prevent the user from dropping the star here
+    let canvas = get("star-canvas");
+    if (((e.pageX + tooltip.clientWidth + 2) > canvas.clientWidth)
+    || ((e.pageY + tooltip.clientHeight + 2) > canvas.clientHeight)) {
+        if (!canvas.classList.contains("outscope")) {
+            canvas.classList.add("outscope");
+        }
+    } else {
+        if (canvas.classList.contains("outscope")) {
+            canvas.classList.remove("outscope");
+        }
+    }
 }
 
 // drop star if holding one.
 function e_drop_star(e) {
-    if (star_edit_mode === false) {
+    if (star_edit_mode === false || get("star-canvas").classList.contains("outscope")) {
         return ;
     }
     let star_tooltip = get("mouse-tooltip-ownstar");
@@ -264,6 +331,29 @@ function e_drop_star(e) {
 async function updateGemCounter() {
     let gems_left = api_own_stars.gems - countGems();
     get("gem-counter").innerHTML = `Il vous reste <b>${gems_left} fragments d’étoile</b> !`;
+
+    let available_stars = get("tab-1-content");
+
+    for (let i = 0; i < available_stars.children.length; i++) {
+        if (gems_left < available_stars.children[i].dataset.price) {
+            if (!available_stars.children[i].classList.contains("disabled")) {
+                available_stars.children[i].classList.add("disabled");
+            }
+        } else {
+            if (available_stars.children[i].classList.contains("disabled")) {
+                available_stars.children[i].classList.remove("disabled");
+            }
+        }
+    }
+    if (api_own_stars.gems == gems_left) {
+        if (!get("star-send-button").classList.contains("disabled")) {
+            get("star-send-button").classList.add("disabled");
+        }
+    } else {
+        if (get("star-send-button").classList.contains("disabled")) {
+            get("star-send-button").classList.remove("disabled");
+        }
+    }
 }
 
 function countGems() {

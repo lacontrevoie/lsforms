@@ -2,10 +2,6 @@ use actix_web::{error, http::StatusCode, http::header::ContentType, HttpResponse
 use std::fmt;
 use std::fmt::Debug;
 
-// TODO: transform errorkinds into regular messages/notifications
-// and add type/kind (error, info) in another attribute
-// for message color
-
 #[derive(Debug, Clone)]
 #[repr(u16)]
 pub enum ErrorKind {
@@ -14,6 +10,13 @@ pub enum ErrorKind {
     DbFail,
     CallbackParseFail,
     CallbackReadFail,
+    FileNotFound,
+    FileReadFail,
+    EmailFromParseFail,
+    EmailToParseFail,
+    EmailBodyParseFail,
+    EmailSendFail,
+    EmailBadTemplateId,
     //LinkDeleteDbFail,
     //AwaitFail,
     // warn errors: 100 -> 199
@@ -33,6 +36,12 @@ pub enum ErrorKind {
     //CookieParseFail,
     // info errors: 300 -> 399
     TransactionExists = 300,
+    TransactionUpdated,
+    StarPostInvalidToken,
+    StarPostInvalidStartype,
+    StarPostInvalidPct,
+    StarPostTooManyStars,
+
     //LinkNotFound = 300,
     //InvalidUrlFrom,
     //InvalidUrlTo,

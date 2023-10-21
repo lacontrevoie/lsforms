@@ -2,8 +2,9 @@
 //use crate::db::models::{NewTransaction, NewStar};
 use crate::{Config, DbPool, DbConn, PooledDbConn};
 use crate::errors::{ErrorKind, ServerError, throw};
-use crate::db::models::{NewTransaction, PublicStar, OwnStar};
-use crate::db::structs::{Transaction, EventType};
+use crate::db::models::{NewStar, NewTransaction, PublicStar, OwnStar, OwnStarWithId};
+use crate::db::structs::{Star, Transaction, EventType};
+use crate::webmodels::{sanitize, OwnTokenPost};
 
 use diesel::prelude::*;
 use diesel::dsl;
@@ -12,7 +13,7 @@ use serde_json::Value;
 use rand::distributions::{Alphanumeric, DistString};
 
 pub fn get_conn(dbpool: &DbPool) -> Result<PooledDbConn, ServerError> {
-    let mut conn = dbpool
+    let conn = dbpool
         .get()
         .map_err(|e| throw(ErrorKind::DbPool, e.to_string()));
     conn
@@ -22,13 +23,12 @@ impl EventType {
     pub fn from_int(i: i32) -> Option<Self> {
         match i {
             0 => Some(EventType::OrderMembership),
-            1 => Some(EventType::OrderMembershipAndDonation),
-            2 => Some(EventType::OrderDonation),
-            3 => Some(EventType::OrderUnknown),
-            4 => Some(EventType::PaymentMonthlyDonation),
-            5 => Some(EventType::PaymentMembership),
-            6 => Some(EventType::PaymentDonation),
-            7 => Some(EventType::PaymentUnknown),
+            1 => Some(EventType::OrderDonation),
+            2 => Some(EventType::OrderUnknown),
+            3 => Some(EventType::PaymentMonthlyDonation),
+            4 => Some(EventType::PaymentMembership),
+            5 => Some(EventType::PaymentDonation),
+            6 => Some(EventType::PaymentUnknown),
             _ => None,
         }
     }
@@ -37,14 +37,27 @@ impl EventType {
     }
 }
 
+impl Star {
+    pub fn insert_bulk(conn: &mut DbConn, i_stars: &[NewStar]) -> Result<usize, ServerError> {
+        use crate::db::schema::star::{table};
+
+        diesel::insert_into(table)
+            .values(i_stars)
+            .execute(conn)
+            .map_err(|e| {
+            throw(ErrorKind::DbFail, e.to_string())
+        })
+    }
+}
+
 impl PublicStar {
     pub fn get_all_public(conn: &mut DbConn) -> Result<Vec<PublicStar>, ServerError> {
         use crate::db::schema::star::{table as s, id, startype, position_x, position_y};
-        use crate::db::schema::transaction::{table as t, day, username};
+        use crate::db::schema::transaction::{table as t, day, username, message};
 
         s
             .inner_join(t)
-            .select((id, startype, day, username, position_x, position_y))
+            .select((id, startype, day, username, message, position_x, position_y))
             .get_results::<PublicStar>(conn)
             .map_err(|e| {
             throw(ErrorKind::DbFail, e.to_string())
@@ -56,14 +69,14 @@ impl OwnStar {
     // Returns Ok(Some()) if a transaction with the given token is found
     // Returns Ok(None) if no transaction is found with the token 
     // Returns Err in case of DB error
-    pub fn get_from_token(conn: &mut DbConn, i_token: String) -> Result<Option<OwnStar>, ServerError> {
-        use crate::db::schema::transaction::{table, token, username, message, gems, is_token_used};
+    pub fn get_from_token(conn: &mut DbConn, i_token: &str) -> Result<Option<OwnStarWithId>, ServerError> {
+        use crate::db::schema::transaction::{table, id, token, username, message, gems, is_token_used};
 
         table
             .filter(token.eq(i_token))
             .filter(is_token_used.eq(false))
-            .select((username, message, gems))
-            .get_result::<OwnStar>(conn)
+            .select((id, username, message, gems))
+            .get_result::<OwnStarWithId>(conn)
             .optional()
             .map_err(|e| {
                 throw(ErrorKind::DbFail, e.to_string())
@@ -84,9 +97,10 @@ impl Transaction {
     }
 
     pub fn update(conn: &mut DbConn, i_tr: &Transaction) -> Result<Transaction, ServerError> {
-        use crate::db::schema::transaction::{table};
+        use crate::db::schema::transaction::{table, id};
 
         diesel::update(table)
+            .filter(id.eq(i_tr.id))
             .set(i_tr)
             .get_result::<Transaction>(conn)
             .map_err(|e| {
@@ -116,10 +130,26 @@ impl Transaction {
                 throw(ErrorKind::DbFail, e.to_string())
             })
     }
+    
+    pub fn update_with_stars(conn: &mut DbConn, i_id: i32, star_post: OwnTokenPost) -> Result<Transaction, ServerError> {
+        use crate::db::schema::transaction::{table, is_token_used, username, message, id};
+
+        diesel::update(table)
+            .filter(id.eq(i_id))
+            .set((is_token_used.eq(true), username.eq(star_post.username), message.eq(star_post.message)))
+            .get_result::<Transaction>(conn)
+            .map_err(|e| {
+                throw(ErrorKind::DbFail, e.to_string())
+            })
+    }
 }
 
 impl NewTransaction {
-    pub fn from_callback(jresp: &Value) -> Option<NewTransaction> {
+
+    // TO REWORK - we can simplify this fuction.
+    // a callback can contain up to 2 NewTransactions because
+    // of the Membership+Donation case
+    pub fn from_callback(jresp: &Value) -> Option<(NewTransaction, Option<NewTransaction>)> {
 
         // Decode callback from helloasso API
         //
@@ -143,47 +173,57 @@ impl NewTransaction {
                 for e in cf.as_array()? {
                     if e.get("name")? == &config.helloasso.field_username {
                         cf_username = e.get("answer")?.as_str()?.to_string();
+                        cf_username = sanitize(&cf_username);
+                        cf_username.truncate(15);
                     }
                 }
                 for e in cf.as_array()? {
                     if e.get("name")? == &config.helloasso.field_message {
                         cf_message = e.get("answer")?.as_str()?.to_string();
+                        cf_message = sanitize(&cf_message);
+                        cf_message.truncate(50);
                     }
                 }
             }
 
             // define event type
             let event_type = match j.get("formType")?.as_str()? {
-                "Membership" => {
-                    if j.get("payments")?.get(1).is_some() {
-                        EventType::OrderMembershipAndDonation
-                    } else {
-                        EventType::OrderMembership
-                    }
-                },
+                "Membership" => EventType::OrderMembership,
                 "Donation" => EventType::OrderDonation,
                 // can be CrowdFunding, Event, PaymentForm, Checkout or Shop
                 _ => EventType::OrderUnknown,
             };
 
-            let amount = inner_payment.get("amount")?.as_i64()? as i32;
+            let amount = inner_payment.get("items")?.get(0)?.get("shareAmount")?.as_i64()? as i32;
 
-            Some(NewTransaction {
+            let new_tr_0 = NewTransaction {
                 username: cf_username,
                 message: cf_message,
                 email: j.get("payer")?.get("email")?.as_str()?.to_string(),
                 day: Utc::now().naive_utc().date(),
-                amount: amount,
+                amount,
                 gems: Self::calc_gems(amount),
                 token: Self::gen_random(),
-                ha_id: inner_payment.get("id")?.as_i64()? as i32,
+                ha_id: inner_payment.get("items")?.get(0)?.get("id")?.as_i64()? as i32,
                 receipt_url: inner_payment.get("paymentReceiptUrl")?.as_str()?.to_string(),
                 event_type: event_type.to_int(),
                 is_mail_sent: false,
                 is_token_used: false,
                 is_checked: false,
-            })
+            };
 
+            if let Some(payment_1) = j.get("payments")?.get(0)?.get("items")?.get(1) {
+                let mut new_tr_1 = new_tr_0.clone();
+                new_tr_1.amount = payment_1.get("shareAmount")?.as_i64()? as i32;
+                new_tr_1.gems = Self::calc_gems(new_tr_1.amount);
+                new_tr_1.token = Self::gen_random();
+                new_tr_1.ha_id = payment_1.get("id")?.as_i64()? as i32;
+                new_tr_1.event_type = EventType::to_int(&EventType::OrderDonation);
+                
+                Some((new_tr_0, Some(new_tr_1)))
+            } else {
+                Some((new_tr_0, None))
+            }
         }
         else if ha_event_type == "Payment" {
 
@@ -197,23 +237,40 @@ impl NewTransaction {
                 _ => EventType::PaymentUnknown,
             };
 
-            let amount = j.get("amount")?.as_i64()? as i32;
+            let amount = j.get("items")?.get(0)?.get("shareAmount")?.as_i64()? as i32;
 
-            Some(NewTransaction {
+            let new_tr_0 = NewTransaction {
                 username: String::new(),
                 message: String::new(),
                 email: j.get("payer")?.get("email")?.as_str()?.to_string(),
                 day: Utc::now().naive_utc().date(),
-                amount: amount,
+                amount,
                 gems: Self::calc_gems(amount),
                 token: Self::gen_random(),
-                ha_id: j.get("id")?.as_i64()? as i32,
+                ha_id: j.get("items")?.get(0)?.get("id")?.as_i64()? as i32,
                 receipt_url: j.get("paymentReceiptUrl")?.as_str()?.to_string(),
                 event_type: event_type.to_int(),
                 is_mail_sent: false,
                 is_token_used: false,
                 is_checked: false,
-            })
+            };
+
+
+            // handle membership+donation case
+            // copied from above
+            // (wrongly?) consider the 2nd payment is a donation, the first being a membership.
+            if let Some(payment_1) = j.get("items")?.get(1) {
+                let mut new_tr_1 = new_tr_0.clone();
+                new_tr_1.amount = payment_1.get("shareAmount")?.as_i64()? as i32;
+                new_tr_1.gems = Self::calc_gems(new_tr_1.amount);
+                new_tr_1.token = Self::gen_random();
+                new_tr_1.ha_id = payment_1.get("id")?.as_i64()? as i32;
+                new_tr_1.event_type = EventType::to_int(&EventType::PaymentDonation);
+                
+                Some((new_tr_0, Some(new_tr_1)))
+            } else {
+                Some((new_tr_0, None))
+            }
         }
         else {
             // Form event types and others (?).
@@ -247,7 +304,7 @@ impl NewTransaction {
                 gems = gems + 5 - gems_modulo;
 
                 if gems_modulo >= 3 {
-                    gems = gems + 5;
+                    gems += 5;
                 }
                 gems
             },

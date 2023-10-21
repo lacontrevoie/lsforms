@@ -11,7 +11,7 @@
         <div>
             <h2 class="title">Liste des transactions</h2>
         </div>
-        <div>
+        <div class="table-container">
             <table id="trans-table" class="trans-table">
                 <thead>
                     <tr>
@@ -34,6 +34,15 @@
                 <tbody id="trans-table-body">
                 </tbody>
             </table>
+        </div>
+        <div id="send-box-modal" class="send-box-container hidden">
+            <div class="send-box">
+                <h2 class="title">Envoyer un email à <span id="title-username"></span></h2>
+                <div id="advice" class="advice">
+                </div>
+                <div id="templates-list" class="button-group">
+                </div>
+            </div>
         </div>
     </body>
 </html>

@@ -2,6 +2,8 @@
 body {
     font-family: 'Contre-Aller', Ubuntu, sans-serif;
     margin: 0;
+    background-color: #28292b;
+    color: whitesmoke;
 }
 
 @font-face {
@@ -17,9 +19,18 @@ body {
 }
 
 .trans-table {
+    width: 100%;
+}
+
+.table-container {
+    background-color: #00000042;
+    padding: 1.5rem;
     min-width: 800px;
     width: 80%;
     margin: auto;
+    border-radius: 5px;
+    overflow-x: auto;
+    box-shadow: 0 0 5px rgba(0,0,0,.18),0 5px 5px rgba(0,0,0,.18);
 }
 
 .trans-table, .trans-table th, .trans-table td {
@@ -29,11 +40,99 @@ body {
 
 .trans-table th, .trans-table td {
     padding: 4px;
-    background-color: #f1f1f1;
     border-bottom: 1px solid #444;
 }
 
 tr.tr-row.is_checked td {
-    background-color: #b9ffb9;
+    background-color: #00ff002e;
     color: gray;
+}
+
+.send-box {
+    min-width: 40%;
+    margin: auto;
+    padding: 2rem 2rem;
+    background-color: #1e1e20;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,.48),0 8px 8px rgba(0,0,0,.18);
+    position: relative;
+    color: whitesmoke;
+}
+
+.send-box-container {
+    position: fixed;
+    z-index: 50;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #00000055;
+    display: flex;
+}
+
+.button-group > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0.5rem 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+    border-radius: 4px;
+}
+
+.button-group > .advice-highlight {
+    border: 1px solid green;
+}
+
+.button-group > .advice-maybe {
+    border: 1px solid orange;
+}
+
+button.big {
+    padding: 0.5rem;
+}
+
+button.center {
+    margin: auto;
+    display: block;
+}
+
+button.is-sending, button.is-sending:hover {
+    background-color: #595959;
+}
+
+button {
+    background-color: #28292b;
+    color: whitesmoke;
+    border: 1px solid whitesmoke;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background-color: #1e1e20;
+
+}
+
+.advice {
+    margin: 1rem 0;
+    max-width: 800px;
+    font-size: 18px;
+}
+
+@media (max-width: 800px) {
+    button.big {
+        padding: 4px;
+    }
+}
+@media (max-width: 1280px) {
+    .send-box {
+        max-width: calc(95% - 4rem);
+        max-height: 80%;
+    }
+}
+
+.hidden {
+    display: none !important;
 }

@@ -21,11 +21,8 @@ database_url = "./db.sqlite"
 
 [mail]
 
-# Email address that receives contact forms
-contact_form_dest = "forms-address@example.org"
-
 # Mailserver's FQDN
-external_address = "mail.example.org"
+mailserver_address = "example.org"
 
 # The email used for SMTP authentication
 sender_email = "mailer-account@example.org"
@@ -34,10 +31,33 @@ sender_email = "mailer-account@example.org"
 sender_password = "mailer password"
 
 # The email address to use in the From field when sending emails
-send_as = "postmaster@example.org"
-
-# The name to use in the From field when sending emails
-sender_name = "Your Org Name"
+send_as = "Postmaster <postmaster@example.org>"
 
 # Your organisation's contact address (in Reply-To header)
 contact_address = "contact@example.org"
+
+# Email templates
+templates = [
+    { id = 1, name = "Don (tutoiement)", title = "Merci d'avoir fait un don !", path = "emails/tu/donation.txt" },
+    { id = 2, name = "Don en campagne (tutoiement)", title = "Merci d'avoir fait un don !", path = "emails/tu/donation-campaign.txt" },
+    { id = 3, name = "Première adhésion (tutoiement)", title = "Merci d'avoir adhéré !", path = "emails/tu/membership.txt" },
+    { id = 4, name = "Renouvellement d’adhésion (tutoiement)", title = "Merci d'avoir renouvelé ton adhésion !", path = "emails/tu/membership-renew.txt" },
+    { id = 5, name = "Don (vouvoiement)", title = "Merci pour votre don !", path = "emails/vous/donation.txt" },
+    { id = 6, name = "Don en campagne (vouvoiement)", title = "Merci pour votre don !", path = "emails/vous/donation-campaign.txt" },
+    { id = 7, name = "Première adhésion (vouvoiement)", title = "Merci d'avoir adhéré !", path = "emails/vous/membership.txt" },
+    { id = 8, name = "Renouvellement d’adhésion (vouvoiement)", title = "Merci d'avoir renouvelé votre adhésion !", path = "emails/vous/membership-renew.txt" }
+]
+
+[helloasso]
+
+# Key used to authenticate with helloasso properly.
+# Should be URL-safe random characters, at least 32.
+# The final callback URL is https://{hostname}/callback/helloasso/{callback_key}
+# Don't leave it empty!
+callback_key = "CHANGE ME"
+
+# The custom field label for username
+field_username = "Champ personnalisé 1"
+
+# The custom field label for message
+field_message = "Champ personnalisé 2"

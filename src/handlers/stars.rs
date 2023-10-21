@@ -1,8 +1,10 @@
 use crate::errors::{ErrorKind, ServerError, throw};
 use crate::db::methods::get_conn;
-use crate::db::models::{PublicStar, OwnStar};
-use crate::webmodels::{GenericId, OwnToken, ClientStatus};
-use crate::DbPool;
+use crate::db::generic::db_remove;
+use crate::db::models::{NewStar, PublicStar, OwnStar};
+use crate::db::structs::{Star, Transaction};
+use crate::webmodels::{GenericId, OwnToken, OwnTokenPost, ClientStatus};
+use crate::{DbPool, db};
 
 use actix_web::{get, post, delete, HttpResponse, web};
 
@@ -14,10 +16,16 @@ pub async fn get_stars_own(
     
     let mut conn = get_conn(&dbpool)?;
 
-    let ownstar = OwnStar::get_from_token(&mut conn, query.token)?;
+    let ownstar_withid = OwnStar::get_from_token(&mut conn, &query.token)?;
 
-    if let Some(o) = ownstar {
-        Ok(HttpResponse::Ok().json(o))
+
+    if let Some(o) = ownstar_withid {
+        let ownstar = OwnStar {
+            username: o.username,
+            message: o.message,
+            gems: o.gems,
+        };
+        Ok(HttpResponse::Ok().json(ownstar))
     } else {
 
         let c_err = ClientStatus {
@@ -26,15 +34,44 @@ pub async fn get_stars_own(
         };
         Ok(HttpResponse::Ok().json(c_err))
     }
-
-    // throw(kind, msgstring) -> ServerError
 }
 
 #[post("/api/stars/own")]
-pub async fn post_stars_own() -> Result<HttpResponse, ServerError> {
+pub async fn post_stars_own(
+    dbpool: web::Data<DbPool>,
+    web::Json(mut star_post): web::Json<OwnTokenPost>,
+    ) -> Result<HttpResponse, ServerError> {
+    let mut conn = get_conn(&dbpool)?;
 
-    Ok(HttpResponse::Ok().body("OK"))
-    // throw(kind, msgstring) -> ServerError
+    // check if the stars are sent by the rightful user
+    let ownstar = OwnStar::get_from_token(&mut conn, &star_post.token)?;
+
+    if let Some(o) = ownstar {
+        // parse and validate the stars
+        star_post.validate(o.gems)?;
+
+        // 
+        let mut new_stars: Vec<NewStar> = Vec::new();
+        for s in &star_post.stars {
+            new_stars.push(NewStar {
+                startype: s.startype,
+                position_x: s.position_x,
+                position_y: s.position_y,
+                transactionid: o.id,
+            });
+        }
+
+        Star::insert_bulk(&mut conn, &new_stars)?;
+        Transaction::update_with_stars(&mut conn, o.id, star_post)?;
+
+        let c_ok = ClientStatus {
+            code: 1001,
+            message: "OK".to_string()
+        };
+        Ok(HttpResponse::Ok().json(c_ok))
+    } else {
+        return Err(throw(ErrorKind::StarPostInvalidToken, format!("given token: {}", star_post.token)));
+    }
 }
 
 #[get("/api/stars/global")]
@@ -53,6 +90,12 @@ pub async fn delete_star(
     ) -> Result<HttpResponse, ServerError> {
     let mut conn = get_conn(&dbpool)?;
 
-    Ok(HttpResponse::Ok().body("Not implemented"))
+    db_remove(&mut conn, db::schema::star::table, params.id)?;
+
+    let c_ok = ClientStatus {
+        code: 1001,
+        message: "OK".to_string()
+    };
+    Ok(HttpResponse::Ok().json(c_ok))
 }
 
