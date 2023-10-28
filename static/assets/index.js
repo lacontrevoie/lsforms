@@ -103,7 +103,18 @@ async function loadStarSelector() {
     get("star-selector-toggler").addEventListener("click", e_toggle_star_select);
     for (let i = 0; i < data_stars.length; i++) {
         let star_item = document.createElement("div");
-        star_item.innerHTML = `<img src="${data_stars[i].path}" /><div class="star-price">${data_stars[i].price}</div>`;
+
+        let star_item_img = document.createElement("img");
+        star_item_img.src = data_stars[i].path;
+        star_item_img.style.width = `${data_stars[i].size_pct}%`
+        star_item_img.style.height = `${data_stars[i].size_pct}%`
+        star_item.appendChild(star_item_img);
+
+        let star_item_price = document.createElement("div");
+        star_item_price.classList.add("star-price");
+        star_item_price.innerHTML = data_stars[i].price;
+        star_item.appendChild(star_item_price);
+
         star_item.classList.add("star-item");
         star_item.dataset.startype = data_stars[i].startype;
         star_item.dataset.path = data_stars[i].path;
@@ -142,8 +153,8 @@ function putStar(stardata, isOwn) {
     new_star.src = starinfo.path;
     new_star.style.left = `${stardata.position_x}%`;
     new_star.style.top = `${stardata.position_y}%`;
-    new_star.style.width = `calc(4% * ${starinfo.size_pct / 100})`
-    new_star.style.height = `calc(4% * ${starinfo.size_pct / 100})`
+    new_star.style.width = `calc(6% * ${starinfo.size_pct / 100})`
+    new_star.style.height = `calc(6% * ${starinfo.size_pct / 100})`
     canvas.appendChild(new_star);
 
     if (isOwn) {
@@ -272,8 +283,8 @@ function e_hold_star() {
     let tooltip_img = document.createElement("img");
     tooltip_img.src = `${this.dataset.path}`;
     tooltip_star.appendChild(tooltip_img);
-    tooltip_star.style.width = `calc(4% * ${this.dataset.size_pct / 100})`
-    tooltip_star.style.height = `calc(4% * ${this.dataset.size_pct / 100})`
+    tooltip_star.style.width = `calc(6% * ${this.dataset.size_pct / 100})`
+    tooltip_star.style.height = `calc(6% * ${this.dataset.size_pct / 100})`
     
     // listen on star placements in edit mode
     own_canvas.addEventListener('mousemove', function(e) { e_follow_star(e, tooltip_star) });

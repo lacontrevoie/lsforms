@@ -3,42 +3,84 @@
         "startype": 1,
         "path": "/stars/01.svg",
         "price": 5,
-        "size_pct": 25
+        "size_pct": 15
     },
     {
         "startype": 2,
         "path": "/stars/02.svg",
         "price": 5,
-        "size_pct": 25
+        "size_pct": 15
     },
     {
         "startype": 3,
         "path": "/stars/03.svg",
-        "price": 5,
-        "size_pct": 50
+        "price": 10,
+        "size_pct": 30
     },
     {
         "startype": 4,
         "path": "/stars/04.svg",
         "price": 10,
-        "size_pct": 50
+        "size_pct": 30
     },
     {
         "startype": 5,
         "path": "/stars/05.svg",
-        "price": 10,
-        "size_pct": 50
+        "price": 15,
+        "size_pct": 30
     },
     {
         "startype": 6,
         "path": "/stars/06.svg",
-        "price": 40,
-        "size_pct": 70
+        "price": 20,
+        "size_pct": 45
     },
     {
         "startype": 7,
         "path": "/stars/07.svg",
-        "price": 40,
+        "price": 20,
+        "size_pct": 45
+    },
+    {
+        "startype": 8,
+        "path": "/stars/08.svg",
+        "price": 30,
         "size_pct": 70
+    },
+    {
+        "startype": 9,
+        "path": "/stars/09.svg",
+        "price": 45,
+        "size_pct": 80
+    },
+    {
+        "startype": 10,
+        "path": "/stars/10.svg",
+        "price": 60,
+        "size_pct": 65
+    },
+    {
+        "startype": 11,
+        "path": "/stars/11.svg",
+        "price": 60,
+        "size_pct": 80
+    },
+    {
+        "startype": 12,
+        "path": "/stars/12.svg",
+        "price": 75,
+        "size_pct": 90
+    },
+    {
+        "startype": 13,
+        "path": "/stars/13.svg",
+        "price": 75,
+        "size_pct": 90
+    },
+    {
+        "startype": 14,
+        "path": "/stars/14.svg",
+        "price": 100,
+        "size_pct": 95
     }
 ]
