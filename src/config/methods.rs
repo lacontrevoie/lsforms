@@ -29,7 +29,7 @@ impl Config {
     pub fn check(&self) {
         // check config version
         if self.config_version != CONFIG_VERSION {
-            eprintln!("Your configuration file is obsolete! Please update it using config.toml.sample and update its version to {}.", CONFIG_VERSION);
+            eprintln!("Your configuration file is obsolete! Please update it using config.toml.sample and update its version to {CONFIG_VERSION}.");
             panic!();
         }
     }

@@ -10,21 +10,21 @@ use lettre::{Message, SmtpTransport, Transport};
 
 pub fn send(
     tpl: &MailTemplate,
-    dest_address: String,
-    dest_name: String,
-    dest_link: String,
+    dest_address: &str,
+    dest_name: &str,
+    dest_link: &str,
     ) -> Result<(), ServerError> {
     let config = Config::global();
 
     let mut msg_body = init_from_file(&tpl.path)?;
 
-    msg_body = if !dest_name.is_empty() {
-        msg_body.replace("{{NAME}}", &format!(" {}", dest_name))
-    } else {
+    msg_body = if dest_name.is_empty() {
         msg_body.replace("{{NAME}}", "")
+    } else {
+        msg_body.replace("{{NAME}}", &format!(" {dest_name}"))
     };
     
-    msg_body = msg_body.replace("{{LINK}}", &dest_link);
+    msg_body = msg_body.replace("{{LINK}}", dest_link);
 
     let m = Message::builder()
         .from(config.mail.send_as.parse().map_err(|e: AddressError| {

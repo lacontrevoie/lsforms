@@ -80,7 +80,7 @@ impl OwnTokenPost {
         if i32::from(spent_gems) > i_max_gems {
             return Err(throw(
                 ErrorKind::StarPostTooManyStars,
-                format!("star count: {} / {}", spent_gems, i_max_gems)
+                format!("star count: {spent_gems} / {i_max_gems}")
             ));
         }
 

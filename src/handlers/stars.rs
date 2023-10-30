@@ -70,7 +70,7 @@ pub async fn post_stars_own(
         };
         Ok(HttpResponse::Ok().json(c_ok))
     } else {
-        return Err(throw(ErrorKind::StarPostInvalidToken, format!("given token: {}", star_post.token)));
+        Err(throw(ErrorKind::StarPostInvalidToken, format!("given token: {}", star_post.token)))
     }
 }
 

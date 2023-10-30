@@ -26,7 +26,7 @@ pub async fn callback_helloasso(
     }
 
     let jresp = serde_json::from_slice::<Value>(&bodybytes).map_err(|e| {
-        throw(ErrorKind::CallbackParseFail, format!("{}: {:?}", e.to_string(), String::from_utf8(bodybytes.to_vec())))
+        throw(ErrorKind::CallbackParseFail, format!("{}: {:?}", e, String::from_utf8(bodybytes.to_vec())))
     })?;
 
     if let Some(new_tr) = NewTransaction::from_callback(&jresp) {
@@ -44,7 +44,7 @@ pub async fn callback_helloasso(
         // no need for a request body
         Ok(HttpResponse::Ok().finish())
     } else {
-        return Err(throw(ErrorKind::CallbackReadFail, format!("Full response: {}", jresp)));
+        Err(throw(ErrorKind::CallbackReadFail, format!("Full response: {jresp}")))
     }
 }
 
@@ -73,9 +73,9 @@ fn check_override_tr(conn: &mut DbConn, new_tr: &NewTransaction) -> Result<(), S
             Transaction::update(conn, &old_tr)?;
 
             return Err(throw(ErrorKind::TransactionUpdated, format!("ha_id: {}", new_tr.ha_id)));
-        } else {
-            return Err(throw(ErrorKind::TransactionExists, format!("ha_id: {}", new_tr.ha_id)));
         }
+        // else, the transaction is not updated
+        return Err(throw(ErrorKind::TransactionExists, format!("ha_id: {}", new_tr.ha_id)));
     }
 
     // explicitly casting result to Transaction

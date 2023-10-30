@@ -66,13 +66,13 @@ impl fmt::Display for ErrorSeverity {
             ErrorSeverity::Notice => "NOTICE",
             ErrorSeverity::Info => "INFO",
         };
-        write!(f, "{}", severity)
+        write!(f, "{severity}")
     }
 }
 
 impl fmt::Display for ErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
@@ -91,7 +91,6 @@ impl ErrorKind {
     fn severity(&self) -> ErrorSeverity {
         let index: u16 = self.clone() as u16;
         match index {
-            0..=99 => ErrorSeverity::Crit,
             100..=199 => ErrorSeverity::Warn,
             200..=299 => ErrorSeverity::Notice,
             300..=399 => ErrorSeverity::Info,
@@ -109,7 +108,7 @@ impl fmt::Display for ServerError {
 impl error::ResponseError for ServerError {
     fn error_response(&self) -> HttpResponse {
         // print to console
-        eprintln!("{}", self);
+        eprintln!("{self}");
 
         HttpResponseBuilder::new(self.status_code())
             .content_type(ContentType::html())
@@ -118,9 +117,10 @@ impl error::ResponseError for ServerError {
     }
 
     fn status_code(&self) -> StatusCode {
-        match &self.kind.severity() {
+        StatusCode::INTERNAL_SERVER_ERROR
+        /*match &self.kind.severity() {
             _ => StatusCode::INTERNAL_SERVER_ERROR,
-        }
+        }*/
     }
 }
 

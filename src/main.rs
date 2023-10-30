@@ -13,9 +13,9 @@ use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use actix_web::{App, HttpServer, web::Data};
 use actix_files::Files;
 
-use crate::handlers::stars::*;
-use crate::handlers::callbacks::*;
-use crate::handlers::transactions::*;
+use crate::handlers::stars::{get_stars_global, get_stars_own, post_stars_own};
+use crate::handlers::callbacks::{callback_helloasso};
+use crate::handlers::transactions::{delete_transaction, get_email_templates, get_transaction, patch_transaction, post_transaction_send_mail, post_transaction_toggle_check, put_transaction};
 use crate::config::global::CONFIG;
 use crate::config::structs::Config;
 use crate::config::methods::{read_config};

@@ -13,10 +13,9 @@ use serde_json::Value;
 use rand::distributions::{Alphanumeric, DistString};
 
 pub fn get_conn(dbpool: &DbPool) -> Result<PooledDbConn, ServerError> {
-    let conn = dbpool
+    dbpool
         .get()
-        .map_err(|e| throw(ErrorKind::DbPool, e.to_string()));
-    conn
+        .map_err(|e| throw(ErrorKind::DbPool, e.to_string()))
 }
 
 impl EventType {
@@ -32,8 +31,8 @@ impl EventType {
             _ => None,
         }
     }
-    pub fn to_int(&self) -> i32 {
-        *self as i32
+    pub fn to_int(self) -> i32 {
+        self as i32
     }
 }
 
@@ -45,8 +44,8 @@ impl Star {
             .values(i_stars)
             .execute(conn)
             .map_err(|e| {
-            throw(ErrorKind::DbFail, e.to_string())
-        })
+                throw(ErrorKind::DbFail, e.to_string())
+            })
     }
 }
 
@@ -60,8 +59,8 @@ impl PublicStar {
             .select((id, startype, day, username, message, position_x, position_y))
             .get_results::<PublicStar>(conn)
             .map_err(|e| {
-            throw(ErrorKind::DbFail, e.to_string())
-        })
+                throw(ErrorKind::DbFail, e.to_string())
+            })
     }
 }
 
@@ -118,7 +117,7 @@ impl Transaction {
                 throw(ErrorKind::DbFail, e.to_string())
             })
     }
-    
+
     pub fn send_mail(conn: &mut DbConn, i_id: i32) -> Result<Transaction, ServerError> {
         use crate::db::schema::transaction::{table, is_mail_sent, id};
 
@@ -130,7 +129,7 @@ impl Transaction {
                 throw(ErrorKind::DbFail, e.to_string())
             })
     }
-    
+
     pub fn update_with_stars(conn: &mut DbConn, i_id: i32, star_post: OwnTokenPost) -> Result<Transaction, ServerError> {
         use crate::db::schema::transaction::{table, is_token_used, username, message, id};
 
@@ -218,8 +217,8 @@ impl NewTransaction {
                 new_tr_1.gems = Self::calc_gems(new_tr_1.amount);
                 new_tr_1.token = Self::gen_random();
                 new_tr_1.ha_id = payment_1.get("id")?.as_i64()? as i32;
-                new_tr_1.event_type = EventType::to_int(&EventType::OrderDonation);
-                
+                new_tr_1.event_type = EventType::to_int(EventType::OrderDonation);
+
                 Some((new_tr_0, Some(new_tr_1)))
             } else {
                 Some((new_tr_0, None))
@@ -265,8 +264,8 @@ impl NewTransaction {
                 new_tr_1.gems = Self::calc_gems(new_tr_1.amount);
                 new_tr_1.token = Self::gen_random();
                 new_tr_1.ha_id = payment_1.get("id")?.as_i64()? as i32;
-                new_tr_1.event_type = EventType::to_int(&EventType::PaymentDonation);
-                
+                new_tr_1.event_type = EventType::to_int(EventType::PaymentDonation);
+
                 Some((new_tr_0, Some(new_tr_1)))
             } else {
                 Some((new_tr_0, None))
