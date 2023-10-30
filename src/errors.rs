@@ -10,8 +10,6 @@ pub enum ErrorKind {
     // critical errors: 0 -> 99
     DbPool = 0,
     DbFail,
-    CallbackParseFail,
-    CallbackReadFail,
     FileNotFound,
     FileReadFail,
     EmailFromParseFail,
@@ -19,37 +17,21 @@ pub enum ErrorKind {
     EmailBodyParseFail,
     EmailSendFail,
     EmailBadTemplateId,
-    //LinkDeleteDbFail,
-    //AwaitFail,
-    // warn errors: 100 -> 199
+
+    // warn/server-side/important errors: 100 -> 199
     CallbackKeyInvalid = 100,
-    //BadServerAdminKey = 100,
-    //BlockedLinkShortener,
-    //BlockedLinkSpam,
-    //BlockedLinkFreehost,
-    //BlockedName,
-    //CaptchaFail,
-    // notice errors: 200 -> 299
-    //UnsupportedProtocol = 200,
-    //LinkAlreadyExists,
-    //InvalidKey,
-    //NotManagingPhishing,
-    //NotDeletingPhishing,
-    //CookieParseFail,
-    // info errors: 300 -> 399
-    TransactionExists = 300,
-    TransactionUpdated,
-    StarPostInvalidToken,
+    CallbackParseFail,
+    CallbackReadFail,
+
+    // warn/client-side errors: 200 -> 299
+    StarPostInvalidToken = 200,
     StarPostInvalidStartype,
     StarPostInvalidPct,
     StarPostTooManyStars,
-    //LinkNotFound = 300,
-    //InvalidUrlFrom,
-    //InvalidUrlTo,
-    //InvalidLink,
-    //SelflinkForbidden,
-    //NotFound,
-    //PhishingLinkReached,
+
+    // info: 300 -> 399
+    TransactionExists = 300,
+    TransactionUpdated,
 }
 
 pub enum ErrorSeverity {
@@ -113,14 +95,15 @@ impl error::ResponseError for ServerError {
 
         HttpResponseBuilder::new(self.status_code())
             .content_type(ContentType::html())
-            .body(format!("{}", self.clone()))
+            .body(format!("Error: {}", self.kind))
         // TODO: customize errors
     }
 
     fn status_code(&self) -> StatusCode {
-        StatusCode::INTERNAL_SERVER_ERROR
-        /*match &self.kind.severity() {
+        match self.kind.severity() as u16 {
+            200..=299 => StatusCode::BAD_REQUEST,
+            300..=399 => StatusCode::OK,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
-        }*/
+        }
     }
 }
