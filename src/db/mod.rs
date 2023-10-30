@@ -1,5 +1,5 @@
-pub mod schema;
-pub mod structs;
+pub mod generic;
 pub mod methods;
 pub mod models;
-pub mod generic;
+pub mod schema;
+pub mod structs;

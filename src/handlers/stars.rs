@@ -1,23 +1,21 @@
-use crate::errors::{ErrorKind, ServerError, throw};
-use crate::db::methods::get_conn;
 use crate::db::generic::db_remove;
-use crate::db::models::{NewStar, PublicStar, OwnStar};
+use crate::db::methods::get_conn;
+use crate::db::models::{NewStar, OwnStar, PublicStar};
 use crate::db::structs::{Star, Transaction};
-use crate::webmodels::{GenericId, OwnToken, OwnTokenPost, ClientStatus};
-use crate::{DbPool, db};
+use crate::errors::{throw, ErrorKind, ServerError};
+use crate::webmodels::{ClientStatus, GenericId, OwnToken, OwnTokenPost};
+use crate::{db, DbPool};
 
-use actix_web::{get, post, delete, HttpResponse, web};
+use actix_web::{delete, get, post, web, HttpResponse};
 
 #[get("/api/stars/own")]
 pub async fn get_stars_own(
     dbpool: web::Data<DbPool>,
     web::Query(query): web::Query<OwnToken>,
-    ) -> Result<HttpResponse, ServerError> {
-    
+) -> Result<HttpResponse, ServerError> {
     let mut conn = get_conn(&dbpool)?;
 
     let ownstar_withid = OwnStar::get_from_token(&mut conn, &query.token)?;
-
 
     if let Some(o) = ownstar_withid {
         let ownstar = OwnStar {
@@ -27,10 +25,9 @@ pub async fn get_stars_own(
         };
         Ok(HttpResponse::Ok().json(ownstar))
     } else {
-
         let c_err = ClientStatus {
             code: 3001,
-            message: "Token invalid or already used".to_string()
+            message: "Token invalid or already used".to_string(),
         };
         Ok(HttpResponse::Ok().json(c_err))
     }
@@ -40,7 +37,7 @@ pub async fn get_stars_own(
 pub async fn post_stars_own(
     dbpool: web::Data<DbPool>,
     web::Json(mut star_post): web::Json<OwnTokenPost>,
-    ) -> Result<HttpResponse, ServerError> {
+) -> Result<HttpResponse, ServerError> {
     let mut conn = get_conn(&dbpool)?;
 
     // check if the stars are sent by the rightful user
@@ -50,7 +47,7 @@ pub async fn post_stars_own(
         // parse and validate the stars
         star_post.validate(o.gems)?;
 
-        // 
+        //
         let mut new_stars: Vec<NewStar> = Vec::new();
         for s in &star_post.stars {
             new_stars.push(NewStar {
@@ -66,11 +63,14 @@ pub async fn post_stars_own(
 
         let c_ok = ClientStatus {
             code: 1001,
-            message: "OK".to_string()
+            message: "OK".to_string(),
         };
         Ok(HttpResponse::Ok().json(c_ok))
     } else {
-        Err(throw(ErrorKind::StarPostInvalidToken, format!("given token: {}", star_post.token)))
+        Err(throw(
+            ErrorKind::StarPostInvalidToken,
+            format!("given token: {}", star_post.token),
+        ))
     }
 }
 
@@ -86,16 +86,15 @@ pub async fn get_stars_global(dbpool: web::Data<DbPool>) -> Result<HttpResponse,
 #[delete("/admin/api/stars/{id}")]
 pub async fn delete_star(
     dbpool: web::Data<DbPool>,
-    params: web::Path<GenericId>
-    ) -> Result<HttpResponse, ServerError> {
+    params: web::Path<GenericId>,
+) -> Result<HttpResponse, ServerError> {
     let mut conn = get_conn(&dbpool)?;
 
     db_remove(&mut conn, db::schema::star::table, params.id)?;
 
     let c_ok = ClientStatus {
         code: 1001,
-        message: "OK".to_string()
+        message: "OK".to_string(),
     };
     Ok(HttpResponse::Ok().json(c_ok))
 }
-

@@ -1,6 +1,6 @@
-use diesel::{self, prelude::*};
-use chrono::{NaiveDate};
 use crate::db::schema::{star, transaction};
+use chrono::NaiveDate;
+use diesel::{self, prelude::*};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Insertable, Debug, Clone)]
@@ -55,4 +55,3 @@ pub struct OwnStar {
     pub message: String,
     pub gems: i32,
 }
-

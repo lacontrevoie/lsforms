@@ -1,5 +1,5 @@
+use chrono::NaiveDate;
 use diesel::{self, prelude::*};
-use chrono::{NaiveDate};
 use serde::{Deserialize, Serialize};
 
 use crate::db::schema::{star, transaction};

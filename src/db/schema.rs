@@ -29,7 +29,4 @@ diesel::table! {
 
 diesel::joinable!(star -> transaction (transactionid));
 
-diesel::allow_tables_to_appear_in_same_query!(
-    star,
-    transaction,
-);
+diesel::allow_tables_to_appear_in_same_query!(star, transaction,);

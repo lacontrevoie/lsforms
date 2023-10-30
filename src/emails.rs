@@ -1,11 +1,11 @@
-use crate::Config;
-use crate::config::structs::MailTemplate;
 use crate::config::methods::init_from_file;
-use crate::errors::{ErrorKind, ServerError, throw};
+use crate::config::structs::MailTemplate;
+use crate::errors::{throw, ErrorKind, ServerError};
+use crate::Config;
 
+use lettre::address::AddressError;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
-use lettre::address::AddressError;
 use lettre::{Message, SmtpTransport, Transport};
 
 pub fn send(
@@ -13,7 +13,7 @@ pub fn send(
     dest_address: &str,
     dest_name: &str,
     dest_link: &str,
-    ) -> Result<(), ServerError> {
+) -> Result<(), ServerError> {
     let config = Config::global();
 
     let mut msg_body = init_from_file(&tpl.path)?;
@@ -23,23 +23,28 @@ pub fn send(
     } else {
         msg_body.replace("{{NAME}}", &format!(" {dest_name}"))
     };
-    
+
     msg_body = msg_body.replace("{{LINK}}", dest_link);
 
-    let m = Message::builder()
-        .from(config.mail.send_as.parse().map_err(|e: AddressError| {
-            throw(ErrorKind::EmailFromParseFail, e.to_string())
-        })?)
-        .to(dest_address.parse().map_err(|e: AddressError| {
-            throw(ErrorKind::EmailToParseFail, e.to_string())
-        })?)
-        .subject(&tpl.name)
-        .header(ContentType::TEXT_PLAIN)
-        .body(msg_body).map_err(|e| {
-            throw(ErrorKind::EmailBodyParseFail, e.to_string())
-        })?;
+    let m =
+        Message::builder()
+            .from(
+                config.mail.send_as.parse().map_err(|e: AddressError| {
+                    throw(ErrorKind::EmailFromParseFail, e.to_string())
+                })?,
+            )
+            .to(dest_address
+                .parse()
+                .map_err(|e: AddressError| throw(ErrorKind::EmailToParseFail, e.to_string()))?)
+            .subject(&tpl.name)
+            .header(ContentType::TEXT_PLAIN)
+            .body(msg_body)
+            .map_err(|e| throw(ErrorKind::EmailBodyParseFail, e.to_string()))?;
 
-    let creds = Credentials::new(config.mail.sender_email.clone(), config.mail.sender_password.clone());
+    let creds = Credentials::new(
+        config.mail.sender_email.clone(),
+        config.mail.sender_password.clone(),
+    );
 
     // Open a remote connection to gmail
     let mailer = SmtpTransport::relay(&config.mail.mailserver_address)
@@ -48,9 +53,9 @@ pub fn send(
         .build();
 
     // Send the email
-    mailer.send(&m).map_err(|e| {
-        throw(ErrorKind::EmailSendFail, e.to_string())
-    })?;
+    mailer
+        .send(&m)
+        .map_err(|e| throw(ErrorKind::EmailSendFail, e.to_string()))?;
 
     Ok(())
 }

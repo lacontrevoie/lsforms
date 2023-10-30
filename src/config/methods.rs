@@ -1,6 +1,6 @@
-use crate::config::global::{CONFIG_VERSION, CONFIG_FILE, CONFIG, STARS, STARS_FILE};
+use crate::config::global::{CONFIG, CONFIG_FILE, CONFIG_VERSION, STARS, STARS_FILE};
 use crate::config::structs::{Config, Stars};
-use crate::errors::{ErrorKind, ServerError, throw};
+use crate::errors::{throw, ErrorKind, ServerError};
 
 use std::fs::File;
 use std::io::Read;
@@ -11,10 +11,7 @@ pub fn read_config() {
         .set(Config::init())
         .ok()
         .expect("could not load config");
-   STARS
-        .set(Stars::init())
-        .ok()
-        .expect("could not load stars");
+    STARS.set(Stars::init()).ok().expect("could not load stars");
 }
 
 impl Config {
@@ -36,16 +33,13 @@ impl Config {
 }
 
 pub fn init_from_file(filename: &str) -> Result<String, ServerError> {
-    let mut conffile = File::open(filename).map_err(|e| {
-        throw(ErrorKind::FileNotFound, e.to_string())
-    })?;
+    let mut conffile =
+        File::open(filename).map_err(|e| throw(ErrorKind::FileNotFound, e.to_string()))?;
 
     let mut confstr = String::new();
     conffile
         .read_to_string(&mut confstr)
-        .map_err(|e| {
-            throw(ErrorKind::FileReadFail, e.to_string())
-        })?;
+        .map_err(|e| throw(ErrorKind::FileReadFail, e.to_string()))?;
 
     Ok(confstr)
 }

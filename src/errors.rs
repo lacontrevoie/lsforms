@@ -1,4 +1,6 @@
-use actix_web::{error, http::StatusCode, http::header::ContentType, HttpResponseBuilder, HttpResponse};
+use actix_web::{
+    error, http::header::ContentType, http::StatusCode, HttpResponse, HttpResponseBuilder,
+};
 use std::fmt;
 use std::fmt::Debug;
 
@@ -41,7 +43,6 @@ pub enum ErrorKind {
     StarPostInvalidStartype,
     StarPostInvalidPct,
     StarPostTooManyStars,
-
     //LinkNotFound = 300,
     //InvalidUrlFrom,
     //InvalidUrlTo,
@@ -55,7 +56,7 @@ pub enum ErrorSeverity {
     Crit,
     Warn,
     Notice,
-    Info
+    Info,
 }
 
 impl fmt::Display for ErrorSeverity {
@@ -123,4 +124,3 @@ impl error::ResponseError for ServerError {
         }*/
     }
 }
-

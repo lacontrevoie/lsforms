@@ -1,24 +1,27 @@
 #![forbid(unsafe_code)]
 
 mod config;
+mod db;
 mod emails;
 mod errors;
-mod db;
 mod handlers;
 mod webmodels;
 
+use actix_files::Files;
+use actix_web::{web::Data, App, HttpServer};
 use diesel::prelude::*;
 use diesel::r2d2::{self, ConnectionManager, PooledConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
-use actix_web::{App, HttpServer, web::Data};
-use actix_files::Files;
 
-use crate::handlers::stars::{get_stars_global, get_stars_own, post_stars_own};
-use crate::handlers::callbacks::{callback_helloasso};
-use crate::handlers::transactions::{delete_transaction, get_email_templates, get_transaction, patch_transaction, post_transaction_send_mail, post_transaction_toggle_check, put_transaction};
 use crate::config::global::CONFIG;
+use crate::config::methods::read_config;
 use crate::config::structs::Config;
-use crate::config::methods::{read_config};
+use crate::handlers::callbacks::callback_helloasso;
+use crate::handlers::stars::{get_stars_global, get_stars_own, post_stars_own};
+use crate::handlers::transactions::{
+    delete_transaction, get_email_templates, get_transaction, patch_transaction,
+    post_transaction_send_mail, post_transaction_toggle_check, put_transaction,
+};
 
 #[cfg(feature = "postgres")]
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations/postgres");
@@ -48,7 +51,7 @@ fn run_migrations(
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     println!("Constello, starting.");
-    
+
     println!("Reading configuration file…");
     read_config();
 
@@ -67,13 +70,14 @@ async fn main() -> std::io::Result<()> {
     // check configuration validity
     // and panic if it is invalid
     let config = Config::global();
-    
+
     config.check();
 
     // starting the http server
     println!(
         "Server listening at {}:{}",
-        CONFIG.wait().general.listening_address, CONFIG.wait().general.listening_port
+        CONFIG.wait().general.listening_address,
+        CONFIG.wait().general.listening_port
     );
 
     HttpServer::new(move || {
@@ -91,10 +95,13 @@ async fn main() -> std::io::Result<()> {
             .service(post_transaction_send_mail)
             .service(get_email_templates)
             .service(Files::new("/", "./static/").index_file("index.html"))
-            //.service(Files::new("/assets", "./assets"))
-            //.default_service(web::to(default_handler))
+        //.service(Files::new("/assets", "./assets"))
+        //.default_service(web::to(default_handler))
     })
-    .bind((CONFIG.wait().general.listening_address.as_str(), CONFIG.wait().general.listening_port))?
+    .bind((
+        CONFIG.wait().general.listening_address.as_str(),
+        CONFIG.wait().general.listening_port,
+    ))?
     .run()
     .await
 }

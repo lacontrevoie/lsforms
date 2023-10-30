@@ -1,5 +1,5 @@
-use crate::errors::{ErrorKind, ServerError, throw};
 use crate::config::structs::Stars;
+use crate::errors::{throw, ErrorKind, ServerError};
 
 use serde::{Deserialize, Serialize};
 
@@ -59,20 +59,20 @@ impl OwnTokenPost {
             } else {
                 return Err(throw(
                     ErrorKind::StarPostInvalidStartype,
-                    format!("given startype: {}", star.startype)
+                    format!("given startype: {}", star.startype),
                 ));
             }
             // check if percentage is safe
             if star.position_x < 0.0 || star.position_x >= 100.0 {
                 return Err(throw(
                     ErrorKind::StarPostInvalidPct,
-                    format!("given pct for position_x: {}", star.position_x)
+                    format!("given pct for position_x: {}", star.position_x),
                 ));
             }
             if star.position_y < 0.0 || star.position_y >= 100.0 {
                 return Err(throw(
                     ErrorKind::StarPostInvalidPct,
-                    format!("given pct for position_y: {}", star.position_x)
+                    format!("given pct for position_y: {}", star.position_x),
                 ));
             }
         }
@@ -80,17 +80,17 @@ impl OwnTokenPost {
         if i32::from(spent_gems) > i_max_gems {
             return Err(throw(
                 ErrorKind::StarPostTooManyStars,
-                format!("star count: {spent_gems} / {i_max_gems}")
+                format!("star count: {spent_gems} / {i_max_gems}"),
             ));
         }
 
         // sanitize/trim inputs like username and message
         self.username = sanitize(&self.username);
         self.username.truncate(15);
-        
+
         self.message = sanitize(&self.message);
         self.message.truncate(50);
-        
+
         Ok(())
     }
 }

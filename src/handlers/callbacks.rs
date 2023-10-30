@@ -1,32 +1,36 @@
-use crate::errors::{ErrorKind, ServerError, throw};
 use crate::config::structs::Config;
-use crate::{DbPool, DbConn, db};
-use crate::db::structs::{Transaction, EventType};
-use crate::db::methods::get_conn;
 use crate::db::generic::db_insert;
+use crate::db::methods::get_conn;
 use crate::db::models::NewTransaction;
+use crate::db::structs::{EventType, Transaction};
+use crate::errors::{throw, ErrorKind, ServerError};
 use crate::webmodels::CallbackKey;
+use crate::{db, DbConn, DbPool};
 
-use actix_web::{post, HttpResponse, web};
+use actix_web::{post, web, HttpResponse};
 use serde_json::Value;
-
 
 #[post("/callback/helloasso/{callback_key}")]
 pub async fn callback_helloasso(
     bodybytes: web::Bytes,
     dbpool: web::Data<DbPool>,
-    params: web::Path<CallbackKey>
-    ) -> Result<HttpResponse, ServerError> {
-
+    params: web::Path<CallbackKey>,
+) -> Result<HttpResponse, ServerError> {
     let mut conn = get_conn(&dbpool)?;
     let config = Config::global();
 
     if config.helloasso.callback_key != params.callback_key {
-        return Err(throw(ErrorKind::CallbackKeyInvalid, "Wrong callback key!".to_string()));
+        return Err(throw(
+            ErrorKind::CallbackKeyInvalid,
+            "Wrong callback key!".to_string(),
+        ));
     }
 
     let jresp = serde_json::from_slice::<Value>(&bodybytes).map_err(|e| {
-        throw(ErrorKind::CallbackParseFail, format!("{}: {:?}", e, String::from_utf8(bodybytes.to_vec())))
+        throw(
+            ErrorKind::CallbackParseFail,
+            format!("{}: {:?}", e, String::from_utf8(bodybytes.to_vec())),
+        )
     })?;
 
     if let Some(new_tr) = NewTransaction::from_callback(&jresp) {
@@ -44,7 +48,10 @@ pub async fn callback_helloasso(
         // no need for a request body
         Ok(HttpResponse::Ok().finish())
     } else {
-        Err(throw(ErrorKind::CallbackReadFail, format!("Full response: {jresp}")))
+        Err(throw(
+            ErrorKind::CallbackReadFail,
+            format!("Full response: {jresp}"),
+        ))
     }
 }
 
@@ -55,7 +62,6 @@ fn check_override_tr(conn: &mut DbConn, new_tr: &NewTransaction) -> Result<(), S
     if let Some(mut old_tr) = Transaction::find_by_haid(conn, new_tr.ha_id)? {
         // if that's the case, try to add missing username field
         if old_tr.username.is_empty() && !new_tr.username.is_empty() {
-
             old_tr.username = new_tr.username.clone();
 
             if old_tr.message.is_empty() && !new_tr.message.is_empty() {
@@ -64,18 +70,27 @@ fn check_override_tr(conn: &mut DbConn, new_tr: &NewTransaction) -> Result<(), S
 
             // upgrade old transaction event type when
             // we receive an order from an existing payment
-            old_tr.event_type = match (EventType::from_int(old_tr.event_type).unwrap(), EventType::from_int(new_tr.event_type).unwrap()) {
+            old_tr.event_type = match (
+                EventType::from_int(old_tr.event_type).unwrap(),
+                EventType::from_int(new_tr.event_type).unwrap(),
+            ) {
                 (EventType::PaymentDonation, EventType::OrderDonation)
-                    | (EventType::PaymentMembership, EventType::OrderMembership) => new_tr.event_type,
+                | (EventType::PaymentMembership, EventType::OrderMembership) => new_tr.event_type,
                 _ => old_tr.event_type,
             };
 
             Transaction::update(conn, &old_tr)?;
 
-            return Err(throw(ErrorKind::TransactionUpdated, format!("ha_id: {}", new_tr.ha_id)));
+            return Err(throw(
+                ErrorKind::TransactionUpdated,
+                format!("ha_id: {}", new_tr.ha_id),
+            ));
         }
         // else, the transaction is not updated
-        return Err(throw(ErrorKind::TransactionExists, format!("ha_id: {}", new_tr.ha_id)));
+        return Err(throw(
+            ErrorKind::TransactionExists,
+            format!("ha_id: {}", new_tr.ha_id),
+        ));
     }
 
     // explicitly casting result to Transaction
