@@ -1,11 +1,5 @@
 #![forbid(unsafe_code)]
 
-#[macro_use]
-extern crate serde_derive;
-extern crate diesel;
-
-extern crate diesel_migrations;
-
 mod config;
 mod emails;
 mod errors;
@@ -26,11 +20,18 @@ use crate::config::global::CONFIG;
 use crate::config::structs::Config;
 use crate::config::methods::{read_config};
 
-//pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations/postgres");
+#[cfg(feature = "postgres")]
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations/postgres");
+#[cfg(feature = "postgres")]
+type DbConn = PgConnection;
+#[cfg(feature = "postgres")]
+type DB = diesel::pg::Pg;
+
+#[cfg(feature = "sqlite")]
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations/sqlite");
-//type DbConn = PgConnection;
+#[cfg(feature = "sqlite")]
 type DbConn = SqliteConnection;
-//type DB = diesel::pg::Pg;
+#[cfg(feature = "sqlite")]
 type DB = diesel::sqlite::Sqlite;
 
 type DbPool = r2d2::Pool<ConnectionManager<DbConn>>;

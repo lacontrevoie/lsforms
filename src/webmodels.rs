@@ -1,6 +1,8 @@
 use crate::errors::{ErrorKind, ServerError, throw};
 use crate::config::structs::Stars;
 
+use serde::{Deserialize, Serialize};
+
 #[derive(Serialize, Deserialize)]
 pub struct ClientStatus {
     pub code: i32,

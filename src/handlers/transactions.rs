@@ -79,8 +79,6 @@ pub async fn post_transaction_send_mail(
         return Err(throw(ErrorKind::EmailBadTemplateId, format!("given id: {}", params.tpl_id)));
     }
 
-
-
     // mark mail as sent
     Transaction::send_mail(&mut conn, params.tr_id)?;
         

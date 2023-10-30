@@ -1,5 +1,7 @@
 use diesel::{self, prelude::*};
 use chrono::{NaiveDate};
+use serde::{Deserialize, Serialize};
+
 use crate::db::schema::*;
 
 // Combines the notification eventType and:

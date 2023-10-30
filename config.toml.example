@@ -15,8 +15,10 @@ listening_port = 8888
 hostname = "constellation.lacontrevoie.fr"
 
 # The database URL
-# Backend only supports postgres but other DB support can be
-# easily implemented if needed
+# Backend supports both SQLite and PostgreSQL
+# (depending on compilation feature flags)
+# PostgreSQL: postgres://user:password@address:port/database
+# SQLite: /path/to/db.sqlite (can be relative)
 database_url = "./db.sqlite"
 
 [mail]
