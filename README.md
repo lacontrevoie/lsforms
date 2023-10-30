@@ -17,3 +17,27 @@ Outil de gestion des transactions utilisé pour [constellation.lacontrevoie.fr](
 
 Vous pouvez contribuer au projet en regardant les [tickets ouverts](https://git.42l.fr/42l/constello/issues).
 
+### Déploiement
+
+- Clôner le dépôt :
+
+```sh
+git clone https://git.42l.fr/42l/constello # ou ssh://git@git.42l.fr:42084/42l/constello.git
+```
+
+- Compiler le serveur selon le backend de la base de données.
+
+Pour PostgreSQL :
+```sh
+cargo build
+```
+
+Pour SQLite :
+
+```sh
+cargo build --no-default-features --features sqlite
+```
+
+- Copier `config.toml.sample` vers `config.toml` et configurer l’instance. Éventuellement modifier les templates par défaut.
+- Démarrer le serveur. Le binaire `constello` peut être extrait du dossier `target`, tant qu’il se situe à la racine du dépôt.
+- En production : mettre l’application derrière un reverse-proxy et restreindre l’accès aux routes `/admin/` avec une *basic auth* (obligatoire)
