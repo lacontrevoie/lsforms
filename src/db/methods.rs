@@ -1,5 +1,3 @@
-//use crate::db::structs::{Transaction, Star};
-//use crate::db::models::{NewTransaction, NewStar};
 use crate::db::models::{NewStar, NewTransaction, OwnStar, OwnStarWithId, PublicStar};
 use crate::db::structs::{EventType, Star, Transaction};
 use crate::errors::{throw, ErrorKind, ServerError};

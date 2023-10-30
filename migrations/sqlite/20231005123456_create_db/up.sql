@@ -9,7 +9,7 @@ CREATE TABLE "transaction" (
     token VARCHAR NOT NULL UNIQUE,
     ha_id INTEGER NOT NULL,
     receipt_url VARCHAR NOT NULL,
-    event_type VARCHAR NOT NULL,
+    event_type INTEGER NOT NULL,
     is_mail_sent BOOLEAN NOT NULL,
     is_token_used BOOLEAN NOT NULL,
     is_checked BOOLEAN NOT NULL
