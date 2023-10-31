@@ -2,13 +2,13 @@ Bonjour{{NAME}},
 
 Merci beaucoup pour ta généreuse contribution financière qui nous permettra de poursuivre plus sereinement nos activités !
 
-Pour te remercier, nous te proposons de créer une étoile sur notre constellation participative à l’aide de ce lien unique : {{LINK}}
+Pour te remercier, nous te proposons de créer une étoile sur notre constellation participative à l'aide de ce lien unique : {{LINK}}
 
-Si tu as besoin d’un reçu fiscal pour déduire 66% du montant de ton don de tes impôts, ou d’un simple reçu pour ta comptabilité, merci de répondre à cet email dans un délai d’un mois à compter de la réception de cette notification.
+Si tu as besoin d'un reçu fiscal pour déduire 66% du montant de ton don de tes impôts, ou d'un simple reçu pour ta comptabilité, merci de répondre à cet email dans un délai d'un mois à compter de la réception de cette notification.
 
-Merci de ton soutien !
+Merci de ton soutien !
 
 À bientôt,
 
 Le Bureau
-La Contre-Voie − https://lacontrevoie.fr
+La Contre-Voie - https://lacontrevoie.fr
