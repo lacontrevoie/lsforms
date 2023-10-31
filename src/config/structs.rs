@@ -32,6 +32,7 @@ pub struct ConfMail {
 pub struct MailTemplate {
     pub id: i32,
     pub name: String,
+    pub title: String,
     pub path: String,
 }
 

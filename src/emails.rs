@@ -36,7 +36,7 @@ pub fn send(
             .to(dest_address
                 .parse()
                 .map_err(|e: AddressError| throw(ErrorKind::EmailToParseFail, e.to_string()))?)
-            .subject(&tpl.name)
+            .subject(&tpl.title)
             .header(ContentType::TEXT_PLAIN)
             .body(msg_body)
             .map_err(|e| throw(ErrorKind::EmailBodyParseFail, e.to_string()))?;

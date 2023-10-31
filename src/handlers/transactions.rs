@@ -72,7 +72,7 @@ pub async fn post_transaction_send_mail(
 
     if let Some(tpl) = tpl_o {
         let token_url = format!(
-            "https://{}/api/stars/own?token={}",
+            "https://{}/?token={}",
             config.general.hostname, tr.token
         );
         emails::send(tpl, &tr.email, &tr.username, &token_url)?;
