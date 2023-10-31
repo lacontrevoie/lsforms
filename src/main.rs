@@ -17,7 +17,7 @@ use crate::config::global::CONFIG;
 use crate::config::methods::read_config;
 use crate::config::structs::Config;
 use crate::handlers::callbacks::callback_helloasso;
-use crate::handlers::stars::{get_stars_global, get_stars_own, post_stars_own};
+use crate::handlers::stars::{get_stars_global, get_stars_own, post_stars_own, delete_star};
 use crate::handlers::transactions::{
     delete_transaction, get_email_templates, get_transaction, patch_transaction,
     post_transaction_send_mail, post_transaction_toggle_check, put_transaction,
@@ -86,6 +86,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_stars_own)
             .service(post_stars_own)
             .service(get_stars_global)
+            .service(delete_star)
             .service(callback_helloasso)
             .service(get_transaction)
             .service(put_transaction)
