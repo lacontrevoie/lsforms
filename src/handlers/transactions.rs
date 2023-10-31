@@ -70,17 +70,20 @@ pub async fn post_transaction_send_mail(
 
     let tpl_o = config.mail.templates.iter().find(|t| t.id == params.tpl_id);
 
-    if let Some(tpl) = tpl_o {
-        let token_url = format!(
-            "https://{}/?token={}",
-            config.general.hostname, tr.token
-        );
-        emails::send(tpl, &tr.email, &tr.username, &token_url)?;
-    } else {
-        return Err(throw(
-            ErrorKind::EmailBadTemplateId,
-            format!("given id: {}", params.tpl_id),
-        ));
+    // if template id is 0, just mark as sent
+    if params.tpl_id != 0 {
+        if let Some(tpl) = tpl_o {
+            let token_url = format!(
+                "https://{}/?token={}",
+                config.general.hostname, tr.token
+            );
+            emails::send(tpl, &tr.email, &tr.username, &token_url)?;
+        } else {
+            return Err(throw(
+                    ErrorKind::EmailBadTemplateId,
+                    format!("given id: {}", params.tpl_id),
+            ));
+        }
     }
 
     // mark mail as sent
