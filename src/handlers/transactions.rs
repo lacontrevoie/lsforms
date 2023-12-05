@@ -13,7 +13,8 @@ use actix_web::{delete, get, patch, post, put, web, HttpResponse};
 pub async fn get_transaction(dbpool: web::Data<DbPool>) -> Result<HttpResponse, ServerError> {
     let mut conn = get_conn(&dbpool)?;
 
-    let translist: Vec<Transaction> = db_get_all(&mut conn, db::schema::transaction::table)?;
+    let mut translist: Vec<Transaction> = db_get_all(&mut conn, db::schema::transaction::table)?;
+    translist.sort_by(|a, b| b.id.cmp(&a.id));
     Ok(HttpResponse::Ok().json(translist))
 }
 
