@@ -96,5 +96,5 @@ impl OwnTokenPost {
 }
 
 pub fn sanitize(s: &str) -> String {
-    s.replace(['&', '<', '>', '\"', '\''], "")
+    s.replace(['<', '>', '\"', '\''], "")
 }
