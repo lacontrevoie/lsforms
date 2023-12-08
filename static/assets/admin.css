@@ -57,6 +57,8 @@ tr.tr-row.is_checked td {
     box-shadow: 0 0 8px rgba(0,0,0,.48),0 8px 8px rgba(0,0,0,.18);
     position: relative;
     color: whitesmoke;
+    max-height: calc(100% - 4rem);
+    overflow-y: auto;
 }
 
 .send-box-container {
