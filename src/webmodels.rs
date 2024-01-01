@@ -96,7 +96,52 @@ impl OwnTokenPost {
 }
 
 pub fn sanitize(s: &str) -> String {
-    s.replace(['<', '>', '\"', '\''], "")
+    let convert: Vec<(char, &str)> = vec![
+        ('&',  "&amp;"),
+        ('<',  "&lt;"),
+        ('>',  "&gt;"),
+        ('"',  "&quot;"),
+        ('\'', "&#039;"),
+    ];
+
+    let values: Vec<&str> = convert.iter()
+        .map(|v| v.1)
+        .collect();
+
+    let mut output: String = String::from(s);
+
+    let mut iter = convert.into_iter();
+
+    // manually sanitize '&' if not already done
+    let (from, _) = iter.next().unwrap();
+    if from == '&' {
+        let tmp: String = output.chars().rev().collect();
+        output = tmp.split_inclusive(from)
+            .map(|r| {
+                r.chars().rev().collect::<String>()
+            })
+            .rev()
+            .map(|s| {
+                if let Some(stripped) = s.strip_prefix('&') {
+                    // does it starts with the sanitized value?
+                    // if not, preprend "&amp;"
+                    match values.iter().position(|b| s.starts_with(b)) {
+                        Some(_) => s,
+                        None => "&amp;".to_string() + stripped,
+                    }
+                } else {
+                    s
+                }
+            })
+            .collect();
+    }
+
+    // now we can safely convert the other characters
+    iter.for_each(|(from, to)| {
+        output = output.replace(from, to);
+    });
+
+    output
 }
 
 #[cfg(test)]
