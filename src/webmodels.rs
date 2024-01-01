@@ -98,3 +98,40 @@ impl OwnTokenPost {
 pub fn sanitize(s: &str) -> String {
     s.replace(['<', '>', '\"', '\''], "")
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_webmodel_sanitize() {
+        let checks: Vec<(&str, &str)> = vec![
+            // check the conversion
+            ("<", "&lt;"),
+            (">", "&gt;"),
+            ("&", "&amp;"),
+            ("\"", "&quot;"),
+            ("'", "&#039;"),
+
+            ("<3", "&lt;3"),
+            ("<>&\"'", "&lt;&gt;&amp;&quot;&#039;"),
+            ("<>", "&lt;&gt;"),
+
+            // the conversion has already been done, do nothing
+            ("&lt;", "&lt;"),
+            ("&gt;", "&gt;"),
+            ("&amp;", "&amp;"),
+            ("&quot;", "&quot;"),
+            ("&#039;", "&#039;"),
+
+            // string with a mix of both
+            ("<3 &amp; <3", "&lt;3 &amp; &lt;3"),
+            ("<script&gt;</script>", "&lt;script&gt;&lt;/script&gt;"),
+            ("&lt;3 ><", "&lt;3 &gt;&lt;"),
+        ];
+
+        for (input, expected) in checks.into_iter() {
+            assert_eq!(sanitize(input), expected);
+        }
+    }
+}
