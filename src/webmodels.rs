@@ -108,38 +108,34 @@ pub fn sanitize(s: &str) -> String {
         .map(|v| v.1)
         .collect();
 
-    let mut output: String = String::from(s);
-
-    let mut iter = convert.into_iter();
+    let mut output: String = String::from("");
 
     // manually sanitize '&' if not already done
-    let (from, _) = iter.next().unwrap();
-    if from == '&' {
-        let tmp: String = output.chars().rev().collect();
-        output = tmp.split_inclusive(from)
-            .map(|r| {
-                r.chars().rev().collect::<String>()
-            })
-            .rev()
-            .map(|s| {
-                if let Some(stripped) = s.strip_prefix('&') {
-                    // does it starts with the sanitized value?
-                    // if not, preprend "&amp;"
-                    match values.iter().position(|b| s.starts_with(b)) {
-                        Some(_) => s,
-                        None => "&amp;".to_string() + stripped,
-                    }
-                } else {
-                    s
-                }
-            })
-            .collect();
+    let mut i = 0;
+    while let Some(j) = s[i..].find('&') {
+        output.push_str(&s[i..i + j]);
+        match values.iter().position(|v| s[i + j..].starts_with(v)) {
+            Some(p) => {
+                output.push_str(values[p]);
+                i += j + values[p].len();
+            },
+            None => {
+                output.push_str("&amp;");
+                i += j + 1;
+            },
+        }
+    }
+    match i {
+        0 => output.push_str(s),
+        _ => output.push_str(&s[i..]),
     }
 
     // now we can safely convert the other characters
-    iter.for_each(|(from, to)| {
-        output = output.replace(from, to);
-    });
+    convert.into_iter()
+        .filter(|(from, _)| *from != '&')
+        .for_each(|(from, to)| {
+            output = output.replace(from, to);
+        });
 
     output
 }
