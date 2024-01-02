@@ -157,6 +157,7 @@ mod tests {
             ("<3", "&lt;3"),
             ("<>&\"'", "&lt;&gt;&amp;&quot;&#039;"),
             ("<>", "&lt;&gt;"),
+            ("&&&", "&amp;&amp;&amp;"),
 
             // the conversion has already been done, do nothing
             ("&lt;", "&lt;"),
@@ -164,11 +165,14 @@ mod tests {
             ("&amp;", "&amp;"),
             ("&quot;", "&quot;"),
             ("&#039;", "&#039;"),
+            ("&lt;&gt;&amp;&quot;&#039;", "&lt;&gt;&amp;&quot;&#039;"),
+            ("&amp;&amp;&amp;", "&amp;&amp;&amp;"),
 
             // string with a mix of both
             ("<3 &amp; <3", "&lt;3 &amp; &lt;3"),
             ("<script&gt;</script>", "&lt;script&gt;&lt;/script&gt;"),
             ("&lt;3 ><", "&lt;3 &gt;&lt;"),
+            ("&&amp;&", "&amp;&amp;&amp;"),
         ];
 
         for (input, expected) in checks.into_iter() {
