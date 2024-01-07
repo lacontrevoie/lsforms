@@ -16,8 +16,8 @@ pub fn read_config() {
 
 impl Config {
     pub fn init() -> Self {
-        let config: Config = toml::from_str(&init_from_file(CONFIG_FILE).unwrap()).unwrap();
-        config.mail.templates.iter().for_each(|tpl| { tpl.check_validity().unwrap(); });
+        let mut config: Config = toml::from_str(&init_from_file(CONFIG_FILE).unwrap()).unwrap();
+        config.mail.templates.iter_mut().for_each(|tpl| { tpl.set_body().unwrap(); });
         config
     }
 
@@ -47,10 +47,10 @@ pub fn init_from_file(filename: &str) -> Result<String, ServerError> {
 }
 
 impl MailTemplate {
-    pub fn check_validity(&self) -> Result<bool, ServerError> {
+    pub fn set_body(&mut self) -> Result<(), ServerError> {
         // TODO: output the file path in the error
-        init_from_file(&self.path)?;
-        Ok(true)
+        self.body = Some(init_from_file(&self.path)?);
+        Ok(())
     }
 }
 

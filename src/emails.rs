@@ -1,4 +1,3 @@
-use crate::config::methods::init_from_file;
 use crate::config::structs::MailTemplate;
 use crate::errors::{throw, ErrorKind, ServerError};
 use crate::Config;
@@ -16,7 +15,7 @@ pub fn send(
 ) -> Result<(), ServerError> {
     let config = Config::global();
 
-    let mut msg_body = init_from_file(&tpl.path)?;
+    let mut msg_body = tpl.body.clone().unwrap();
 
     msg_body = if dest_name.is_empty() {
         msg_body.replace("{{NAME}}", "")
