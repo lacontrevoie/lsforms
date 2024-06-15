@@ -34,6 +34,7 @@ pub struct MailTemplate {
     pub name: String,
     pub title: String,
     pub path: String,
+    pub body: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
