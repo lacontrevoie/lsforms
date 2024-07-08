@@ -19,6 +19,18 @@ Vous pouvez contribuer au projet en regardant les [tickets ouverts](https://git.
 
 ### Déploiement
 
+#### Avec Docker
+
+Télécharger l’image :
+
+```
+docker pull git.lacontrevoie.fr/lacontrevoie/constello:latest
+```
+
+L’image proposée intègre uniquement le support PostgreSQL.
+
+#### Manuel
+
 - Clôner le dépôt :
 
 ```sh
@@ -37,6 +49,9 @@ Pour SQLite :
 ```sh
 cargo build --no-default-features --features sqlite
 ```
+
+### Configuration
+
 
 - Copier `config.toml.sample` vers `config.toml` et configurer l’instance. Éventuellement modifier les templates par défaut.
 - Démarrer le serveur. Le binaire `constello` peut être extrait du dossier `target`, tant qu’il se situe à la racine du dépôt.
