@@ -1,5 +1,5 @@
-use crate::config::global::{CONFIG, CONFIG_FILE, CONFIG_VERSION, STARS, STARS_FILE};
-use crate::config::structs::{Config, MailTemplate, Stars};
+use crate::config::global::{CONFIG, CONFIG_FILE, CONFIG_VERSION};
+use crate::config::structs::{Config};
 use crate::errors::{throw, ErrorKind, ServerError};
 
 use std::fs::File;
@@ -11,13 +11,11 @@ pub fn read_config() {
         .set(Config::init())
         .ok()
         .expect("could not load config");
-    STARS.set(Stars::init()).ok().expect("could not load stars");
 }
 
 impl Config {
     pub fn init() -> Self {
         let mut config: Config = toml::from_str(&init_from_file(CONFIG_FILE).unwrap()).unwrap();
-        config.mail.templates.iter_mut().for_each(|tpl| { tpl.set_body().unwrap(); });
         config
     }
 
@@ -44,21 +42,4 @@ pub fn init_from_file(filename: &str) -> Result<String, ServerError> {
         .map_err(|e| throw(ErrorKind::FileReadFail, e.to_string()))?;
 
     Ok(confstr)
-}
-
-impl MailTemplate {
-    pub fn set_body(&mut self) -> Result<(), ServerError> {
-        // TODO: output the file path in the error
-        self.body = Some(init_from_file(&self.path)?);
-        Ok(())
-    }
-}
-
-impl Stars {
-    pub fn init() -> Self {
-        serde_json::from_str(&init_from_file(STARS_FILE).unwrap()).unwrap()
-    }
-    pub fn global() -> &'static Stars {
-        STARS.get().expect("Stars not initialized?!")
-    }
 }

@@ -16,7 +16,7 @@ RUN apt update \
 WORKDIR /run_dir
 
 # config.toml will be missing and needs to be mounted
-COPY --from=builder /run_dir/target/release/constello ./
+COPY --from=builder /run_dir/target/release/electre ./
 
 COPY --from=builder /run_dir/emails ./emails
 
@@ -26,4 +26,4 @@ RUN adduser --disabled-password --gecos "" --no-create-home "unprivileged"
 
 USER unprivileged
 
-CMD ["/run_dir/constello"]
+CMD ["/run_dir/electre"]

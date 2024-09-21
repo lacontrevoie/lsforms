@@ -8,30 +8,17 @@ use std::fmt::Debug;
 #[repr(u16)]
 pub enum ErrorKind {
     // critical errors: 0 -> 99
-    DbPool = 0,
-    DbFail,
-    FileNotFound,
+    FileNotFound = 0,
     FileReadFail,
-    EmailFromParseFail,
-    EmailToParseFail,
-    EmailBodyParseFail,
-    EmailSendFail,
-    EmailBadTemplateId,
 
     // warn/server-side/important errors: 100 -> 199
     CallbackKeyInvalid = 100,
-    CallbackParseFail,
-    CallbackReadFail,
 
     // warn/client-side errors: 200 -> 299
     StarPostInvalidToken = 200,
-    StarPostInvalidStartype,
-    StarPostInvalidPct,
-    StarPostTooManyStars,
 
     // info: 300 -> 399
     TransactionExists = 300,
-    TransactionUpdated,
 }
 
 pub enum ErrorSeverity {
