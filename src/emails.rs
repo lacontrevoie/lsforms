@@ -160,7 +160,7 @@ fn fill_form_data(host_config: &HostConfig, form_values: &HashMap<String, String
                 })?;
 
                 let real_value = select_options.get(selected_index - 1)
-                    .ok_or_else(|| throw(EK::FieldSelectOutOfRange, format!("field not found: {}", field.name)))?;
+                    .ok_or_else(|| throw(EK::FieldSelectOutOfRange, format!("unknown index {} for field {}", selected_index - 1, field.name)))?;
 
                 form_data.push_str(&format!("{}: {}\n\n", field.display_name, real_value));
             }
