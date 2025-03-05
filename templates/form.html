@@ -1,0 +1,40 @@
+<form id="lcv-form" action="{{ config.general.hostname }}/{{ hostname }}/send" method="post" class="lcv-form">
+    <p>
+        <span class="required-field-message">Les champs obligatoires sont indiqués avec <span class="required">*</span></span>
+    </p>
+    {%- for input in host.inputs -%}
+        {%- match input.kind -%}
+            {%- when HostInputKind::Text %}
+    <p>
+        <label for="{{ input.name }}">{{ input.display_name }}{% if input.required %} <span class="required">*</span>{% endif %}</label>
+        <input id="{{ input.name }}" name="{{ input.name }}" type="text" value="" size="30" maxlength="{{ input.settings.maxlength.unwrap_or(10000) }}" autocomplete="{{ input.name }}"{% if input.required %} required=""{% endif %} />
+    </p>
+            {%- when HostInputKind::TextArea %}
+    <p>
+        <label for="{{ input.name }}">{{ input.display_name }}{% if input.required %} <span class="required">*</span>{% endif %}</label>
+        <textarea id="{{ input.name }}" name="{{ input.name }}" cols="45" rows="8" maxlength="{{ input.settings.maxlength.unwrap_or(10000) }}"{% if input.required %} required=""{% endif %}></textarea>
+    </p>
+            {%- when HostInputKind::Select %}
+    <p>
+    <label for="{{ input.name }}">{{ input.display_name }}{% if input.required %} <span class="required">*</span>{% endif %}</label>
+        <select id="{{ input.name }}" name="{{ input.name }}"{% if input.required %} required=""{% endif %}>
+            <option value="0" disabled="" selected="">Sélectionnez...</option>
+            {%- for opt in input.settings.options.as_ref().unwrap() %}
+            <option value="{{ loop.index }}">{{ opt }}</option>
+            {%- endfor %}
+        </select>
+    </p>
+            {%- when HostInputKind::Email %}
+    <p>
+        <label for="{{ input.name }}">{{ input.display_name }}{% if input.required %} <span class="required">*</span>{% endif %}</label>
+        <input id="{{ input.name }}" name="{{ input.name }}" type="email" value="" size="30" maxlength="{{ input.settings.maxlength.unwrap_or(10000) }}" autocomplete="{{ input.name }}"{% if input.required %} required=""{% endif %} />
+    </p>
+        {%- endmatch -%}
+    {%- endfor %}
+    <p>
+        <altcha-widget challengeurl="{{ config.general.hostname }}/{{ hostname }}/captcha" hidefooter delay="2000"></altcha-widget>
+    </p>
+    <p>
+        <input name="submit" type="submit" id="submit" class="wp-block-button__link wp-element-button" value="Envoyer" />
+    </p>
+</form>

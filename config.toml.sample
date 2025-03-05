@@ -1,0 +1,53 @@
+# Do not edit that line unless you know what you are doing.
+config_version = 1
+
+[general]
+
+# Listening address
+# use 0.0.0.0 as a wildcard IPv4 address
+# use 127.0.0.1 to only listen local IPv4 connections
+listening_address = "0.0.0.0"
+
+# Listening port, between 1 and 65535.
+# Ports below 1024 will require additional privileges.
+listening_port = 8888
+
+# The hostname where the application is hosted
+# with https:// at the beginning and no trailing slash at the end
+# Only necessary if you are using the templates feature
+hostname = ""
+
+# info, notice, warn or crit
+verbose_level = "info"
+
+[captcha]
+
+# Captcha secret, should be a random string. The longer, the better.
+secret = "C H A N G E   M E"
+
+# Captcha complexity. Increased complexity means more time to resolve it.
+complexity = 500000
+
+# Captcha validity time in minutes.
+expires = 120
+
+[mail]
+
+# Mailserver's FQDN
+mailserver_address = "mail.example.org"
+
+# The email used for SMTP authentication
+sender_email = "mysenderaddress@example.org"
+
+# The password used for SMTP authentication
+sender_password = "mysenderaddresspassword"
+
+# The email address to use in the From field when sending emails
+send_as = "My Org <mysenderaddress@example.org>"
+
+# Email address used to report spams, to the intention of
+# form webmasters.
+contact_spam = "contact@my-org.example.org"
+
+# Mail signature used in sent form submissions to form webmasters.
+mail_signature = "My Org - https://my-org.example.org"

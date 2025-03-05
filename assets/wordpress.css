@@ -1,0 +1,46 @@
+
+.lcv-form input:not([type=submit]), .lcv-form textarea {
+  border:1px solid #949494;
+  font-family:inherit;
+  font-size:1em;
+}
+
+.lcv-form input:not([type=submit]):not([type=checkbox]):not([type=hidden]),
+.lcv-form textarea {
+  padding:calc(.667em + 2px);
+  box-sizing:border-box;
+  display:block;
+  width:100%
+}
+
+.lcv-form {
+  box-sizing:border-box;
+  font-weight:inherit;
+  font-family:inherit;
+  font-size:inherit;
+  line-height:inherit;
+  font-style:inherit;
+  letter-spacing:inherit;
+}
+
+.lcv-form :where(input[type=submit]) {
+  box-shadow:none;
+  cursor:pointer;
+  display:inline-block;
+  overflow-wrap:break-word;
+  text-align:center
+}
+
+.lcv-form label {
+  display:block;
+  margin-bottom:.25em
+}
+
+.lcv-form .title {
+  margin-bottom:0
+}
+
+.lcv-form .title small {
+  font-size:var(--wp--preset--font-size--medium,smaller);
+  margin-left:.5em
+}

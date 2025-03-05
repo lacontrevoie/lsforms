@@ -3,6 +3,10 @@ use actix_web::{
 };
 use std::fmt;
 use std::fmt::Debug;
+use serde::Serialize;
+
+use crate::config::structs::VerboseLevel;
+use crate::config::methods::load_config;
 
 #[derive(Debug, Clone)]
 #[repr(u16)]
@@ -12,13 +16,36 @@ pub enum ErrorKind {
     FileReadFail,
 
     // warn/server-side/important errors: 100 -> 199
-    CallbackKeyInvalid = 100,
+    CaptchaGenerationFailed = 100,
+    FieldSelectNoOptions,
+    EmailLanguageNotFound,
+    EmailLinesFail,
+    EmailSendFail,
+    EmailHostnameReadFail,
+    EmailBodyParseFail,
+    EmailToParseFail,
+    EmailFromParseFail,
+    NoClientIP,
 
     // warn/client-side errors: 200 -> 299
-    StarPostInvalidToken = 200,
+    UnknownHost = 200,
+    CaptchaDisabled,
+    CaptchaFieldMissing,
+    CaptchaPayloadB64Fail,
+    CaptchaPayloadUtf8Fail,
+    CaptchaResultInvalid,
+    CaptchaFoundButDisabled,
+    FormDataNotObject,
+    FormParamNotString,
+    FieldSelectWrongType,
+    FieldEmailWrongType,
+    FieldSelectOutOfRange,
+    FieldRequiredButEmpty,
+    FieldRequiredButMissing,
+    FieldTooLong,
 
     // info: 300 -> 399
-    TransactionExists = 300,
+    // XXX = 300,
 }
 
 pub enum ErrorSeverity {
@@ -57,6 +84,35 @@ pub fn throw(kind: ErrorKind, msg: String) -> ServerError {
     ServerError { kind, msg }
 }
 
+impl ServerError {
+    // for non-blocking errors
+    pub fn display(&self) {
+        let config = load_config();
+        match (self.kind.severity(), &config.general.verbose_level) {
+            (ErrorSeverity::Crit, VerboseLevel::Crit) => {
+                println!("{self}");
+            },
+            (ErrorSeverity::Crit | ErrorSeverity::Warn, VerboseLevel::Warn) => {
+                println!("{self}");
+            },
+            (ErrorSeverity::Crit
+             | ErrorSeverity::Warn
+             | ErrorSeverity::Notice,
+             VerboseLevel::Notice) => {
+                println!("{self}");
+            },
+            (ErrorSeverity::Crit
+             | ErrorSeverity::Warn
+             | ErrorSeverity::Notice
+             | ErrorSeverity::Info,
+             VerboseLevel::Info) => {
+                println!("{self}");
+            },
+            _ => {}
+        }
+    }
+}
+
 impl ErrorKind {
     fn severity(&self) -> ErrorSeverity {
         let index: u16 = self.clone() as u16;
@@ -75,15 +131,23 @@ impl fmt::Display for ServerError {
     }
 }
 
+#[derive(Serialize)]
+pub struct ErrorServerStatus {
+    pub status: String,
+    pub error_kind: String,
+    pub code: u16,
+}
+
 impl error::ResponseError for ServerError {
     fn error_response(&self) -> HttpResponse {
         // print to console
-        eprintln!("{self}");
+        self.display();
 
+        // display limited information in http response
         HttpResponseBuilder::new(self.status_code())
-            .content_type(ContentType::html())
-            .body(format!("Error: {}", self.kind))
-        // TODO: customize errors
+            .content_type(ContentType::json())
+            .json(ErrorServerStatus { status: "error".to_string(), error_kind: self.kind.to_string(), code: self.kind.clone() as u16 })
+            //.body(format!("{{ \"status\": \"error\", \"error_kind\": \"{}\", \"code\": {} }}", self.kind, self.kind.clone() as u16))
     }
 
     fn status_code(&self) -> StatusCode {

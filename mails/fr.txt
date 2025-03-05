@@ -1,0 +1,12 @@
+{{SUBJECT}}Nouveau message dans le formulaire de contact{{/SUBJECT}}
+Bonjour,
+
+Vous avez reçu un nouveau message sur votre formulaire de contact sur {{HOST}}.
+
+Adresse IP : {{IP}}
+
+{{FORMDATA}}
+
+En cas de réception d’un message indésirable ou spam, veuillez NE PAS marquer cet email comme "Spam" et le transmettre à l’adresse {{CONTACT}}.
+
+{{MAIL_SIGNATURE}}

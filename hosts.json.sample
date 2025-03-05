@@ -1,0 +1,56 @@
+{
+    "my-form-website.example.org": {
+        "language": "fr",
+        "recipient": "my-form-recipient@my-org.example.org",
+        "enable_captcha": true,
+        "inputs": [
+            {
+                "display_name": "First name",
+                "name": "first_name",
+                "kind": "text",
+                "required": true,
+                "settings": {}
+            },
+            {
+                "display_name": "Email",
+                "name": "email",
+                "kind": "email",
+                "required": true,
+                "settings": {
+                    "maxlength": 100
+                }
+            },
+            {
+                "display_name": "You are...",
+                "name": "org_type",
+                "kind": "select",
+                "required": true,
+                "settings": {
+                    "options": [
+                        "An individual",
+                        "A business",
+                        "A nonprofit"
+                    ]
+                }
+            },
+            {
+                "display_name": "Delivery instructions",
+                "name": "deliveryinfo",
+                "kind": "text",
+                "required": false,
+                "settings": {
+                    "maxlength": 100
+                }
+            },
+            {
+                "display_name": "Message",
+                "name": "message",
+                "kind": "textarea",
+                "required": true,
+                "settings": {
+                    "maxlength": 400
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,12 @@
+{{SUBJECT}}New contact form message{{/SUBJECT}}
+Hello,
+
+You have received a new message on your contact form at {{HOST}}.
+
+IP address: {{IP}}
+
+{{FORMDATA}}
+
+In case you receive an undesirable or spam message, please DO NOT mark this email as "Spam" and forward it to the address {{CONTACT}}.
+
+{{MAIL_SIGNATURE}}
