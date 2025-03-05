@@ -16,9 +16,7 @@ RUN apt update \
 WORKDIR /run_dir
 
 # config.toml will be missing and needs to be mounted
-COPY --from=builder /run_dir/target/release/lsforms ./
-
-COPY --from=builder /run_dir/emails ./emails
+COPY --from=builder /run_dir/target/release/lsforms /run_dir/mails/ /run_dir/assets/ ./
 
 RUN adduser --disabled-password --gecos "" --no-create-home "unprivileged"
 
