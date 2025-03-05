@@ -136,7 +136,7 @@ fn form_input_check(re_email: &Regex, host_field: &HostInput, form_values: &Hash
             return Err(throw(EK::FieldRequiredButEmpty, format!("field {} is required but empty", host_field.name)));
         }
 
-        if selected_index >= select_options.len() {
+        if selected_index > select_options.len() {
             return Err(throw(EK::FieldSelectOutOfRange, format!("field {} is out of range", host_field.name)));
         }
     }

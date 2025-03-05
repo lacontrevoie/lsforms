@@ -159,7 +159,7 @@ fn fill_form_data(host_config: &HostConfig, form_values: &HashMap<String, String
                     throw(EK::FieldSelectWrongType, format!("field {} is not an unsigned integer: {}", field.name, e))
                 })?;
 
-                let real_value = select_options.get(selected_index - 1)
+                let real_value = select_options.get(selected_index)
                     .ok_or_else(|| throw(EK::FieldSelectOutOfRange, format!("field not found: {}", field.name)))?;
 
                 form_data.push_str(&format!("{}: {}\n\n", field.display_name, real_value));

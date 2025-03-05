@@ -1,5 +1,8 @@
 <form id="lcv-form" action="{{ config.general.hostname }}/{{ hostname }}/send" method="post" class="lcv-form">
     <p>
+        <noscript>Veuillez activer JavaScript dans votre navigateur pour remplir ce formulaire.</noscript>
+    </p>
+    <p>
         <span class="required-field-message">Les champs obligatoires sont indiqués avec <span class="required">*</span></span>
     </p>
     {%- for input in host.inputs -%}
@@ -18,7 +21,7 @@
     <p>
     <label for="{{ input.name }}">{{ input.display_name }}{% if input.required %} <span class="required">*</span>{% endif %}</label>
         <select id="{{ input.name }}" name="{{ input.name }}"{% if input.required %} required=""{% endif %}>
-            <option value="0" disabled="" selected="">Sélectionnez...</option>
+            <option value="" disabled="" selected="">Sélectionnez...</option>
             {%- for opt in input.settings.options.as_ref().unwrap() %}
             <option value="{{ loop.index }}">{{ opt }}</option>
             {%- endfor %}
@@ -32,7 +35,7 @@
         {%- endmatch -%}
     {%- endfor %}
     <p>
-        <altcha-widget challengeurl="{{ config.general.hostname }}/{{ hostname }}/captcha" hidefooter delay="2000"></altcha-widget>
+        <altcha-widget challengeurl="{{ config.general.hostname }}/{{ hostname }}/captcha" hidefooter></altcha-widget>
     </p>
     <p>
         <input name="submit" type="submit" id="submit" class="wp-block-button__link wp-element-button" value="Envoyer" />
