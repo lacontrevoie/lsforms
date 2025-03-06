@@ -1,4 +1,4 @@
-<form id="lcv-form" action="{{ config.general.hostname }}/{{ hostname }}/send" method="post" target="_self" class="lcv-form">
+<form id="lcv-form" action="{{ config.general.hostname }}/{{ hostname }}/send" method="post" class="lcv-form" novalidate>
     <p>
         <noscript>Veuillez activer JavaScript dans votre navigateur pour remplir ce formulaire.</noscript>
     </p>
@@ -38,6 +38,6 @@
         <altcha-widget challengeurl="{{ config.general.hostname }}/{{ hostname }}/captcha" hidefooter></altcha-widget>
     </p>
     <p>
-        <input name="submit" type="submit" id="submit" class="wp-block-button__link wp-element-button" value="Envoyer" />
+        <input name="lcv-form-submit" type="submit" id="lcv-form-submit" class="wp-block-button__link wp-element-button" value="Envoyer" />
     </p>
 </form>
