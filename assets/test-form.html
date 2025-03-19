@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script async defer src="http://localhost:8080/altcha.min.js" type="module"></script>
-        <script async defer src="http://localhost:8080/form-response.js"></script>
+        <script async defer src="http://localhost:8888/altcha.min.js" type="module"></script>
+        <script async defer src="http://localhost:8888/form-response.js"></script>
     </head>
     <body>
-        <form id="lcv-form" action="http://localhost:8080/my-form-website.example.org/send" method="post" class="lcv-form" novalidate>
+        <form id="lcv-form" action="http://localhost:8888/my-form-website.example.org/send" method="post" class="lcv-form" novalidate>
             <p>
             <noscript>Veuillez activer JavaScript dans votre navigateur pour remplir ce formulaire.</noscript>
             </p>
@@ -46,7 +46,7 @@
             <textarea id="message" name="message" cols="45" rows="8" maxlength="4000" required=""></textarea>
             </p>
             <p>
-            <altcha-widget challengeurl="https://static-forms.lacontrevoie.fr/my-form-website.example.org/captcha" hidefooter></altcha-widget>
+            <altcha-widget challengeurl="http://localhost:8888/my-form-website.example.org/captcha" hidefooter></altcha-widget>
             </p>
             <p>
             <input name="lcv-form-submit" type="submit" id="lcv-form-submit" class="wp-block-button__link wp-element-button" value="Envoyer" />
