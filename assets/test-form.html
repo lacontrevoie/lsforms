@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script async defer src="http://localhost:8080/altcha.min.js" type="module"></script>
+        <script async defer src="http://localhost:8080/form-response.js"></script>
+    </head>
+    <body>
+        <form id="lcv-form" action="http://localhost:8080/my-form-website.example.org/send" method="post" class="lcv-form" novalidate>
+            <p>
+            <noscript>Veuillez activer JavaScript dans votre navigateur pour remplir ce formulaire.</noscript>
+            </p>
+            <p>
+            <span class="required-field-message">Les champs obligatoires sont indiqués avec <span class="required">*</span></span>
+            </p>
+            <p>
+            <label for="full_name">Nom <span class="required">*</span></label>
+            <input id="full_name" name="full_name" type="text" value="" size="30" maxlength="10000" autocomplete="full_name" required="" />
+            </p>
+            <p>
+            <label for="org_type">Vous êtes <span class="required">*</span></label>
+            <select id="org_type" name="org_type" required="">
+                <option value="" disabled="" selected="">Sélectionnez...</option>
+                <option value="1">Un particulier</option>
+                <option value="2">Une entreprise</option>
+                <option value="3">Une association</option>
+            </select>
+            </p>
+            <p>
+            <label for="email">Email <span class="required">*</span></label>
+            <input id="email" name="email" type="email" value="" size="30" maxlength="100" autocomplete="email" required="" />
+            </p>
+            <p>
+            <label for="phone">Numéro de téléphone</label>
+            <input id="phone" name="phone" type="text" value="" size="30" maxlength="20" autocomplete="phone" />
+            </p>
+            <p>
+            <label for="phy_addr">Adresse physique</label>
+            <textarea id="phy_addr" name="phy_addr" cols="45" rows="8" maxlength="400"></textarea>
+            </p>
+            <p>
+            <label for="subject">Sujet du message <span class="required">*</span></label>
+            <input id="subject" name="subject" type="text" value="" size="30" maxlength="400" autocomplete="subject" required="" />
+            </p>
+            <p>
+            <label for="message">Corps du message <span class="required">*</span></label>
+            <textarea id="message" name="message" cols="45" rows="8" maxlength="4000" required=""></textarea>
+            </p>
+            <p>
+            <altcha-widget challengeurl="https://static-forms.lacontrevoie.fr/my-form-website.example.org/captcha" hidefooter></altcha-widget>
+            </p>
+            <p>
+            <input name="lcv-form-submit" type="submit" id="lcv-form-submit" class="wp-block-button__link wp-element-button" value="Envoyer" />
+            </p>
+        </form>
+    </body>
+
+</html>

@@ -3,9 +3,11 @@ use actix_web::{
 };
 use std::fmt;
 use std::fmt::Debug;
+use std::collections::HashMap;
 use serde::Serialize;
+use chrono::Utc;
 
-use crate::config::structs::VerboseLevel;
+use crate::config::structs::{Config, VerboseLevel};
 use crate::config::methods::load_config;
 
 #[derive(Debug, Clone)]
@@ -156,5 +158,11 @@ impl error::ResponseError for ServerError {
             300..=399 => StatusCode::OK,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
+    }
+}
+
+pub fn dbg_print_form(config: &Config, form_content: HashMap<String, String>) {
+    if config.general.verbose_level == VerboseLevel::Info {
+        eprintln!("Date: {}; Form content: {:#?}", Utc::now().format("%+"), form_content);
     }
 }

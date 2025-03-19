@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
         {
             use actix_files::Files;
             use crate::config::global::ASSETS_FOLDER;
-            app = app.service(Files::new("/", ASSETS_FOLDER));
+            app = app.service(Files::new("/", ASSETS_FOLDER).index_file("test-form.html"));
         }
 
         

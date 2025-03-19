@@ -79,7 +79,7 @@ pub struct HostConfig {
 
 /* verbosity settings */
 
-#[derive(Deserialize)]
+#[derive(Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum VerboseLevel {
     Info,
