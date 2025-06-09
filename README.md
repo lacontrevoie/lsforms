@@ -92,10 +92,12 @@ The `hosts.json` file is used to define the fields of the forms you want to rece
 
 ```html
 <script async defer src="https://static-forms.mydomain.org/altcha.min.js" type="module"></script>
+<script async defer src="https://static-forms.mydomain.org/altcha-i18n.min.js" type="module"></script>
 <script async defer src="https://static-forms.mydomain.org/form-response.js"></script>
 ```
 
 - `altcha.min.js` : will load the ALTCHA widget if you integrate a captcha into your form.
+- `altcha-i18n.min.js` : will load support for languages other than English if you are willing to support them (optional)
 - `form-response.js` : will handle form submission and display error/success messages.
 
 7. Test your form, and you should be done.
