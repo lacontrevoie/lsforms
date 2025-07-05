@@ -19,6 +19,11 @@ pub struct ServerStatus {
     pub message: Option<String>,
 }
 
+#[get("/health")]
+pub async fn health() -> Result<HttpResponse, ServerError> {
+    Ok(HttpResponse::Ok().body("OK"))
+}
+
 #[get("/{host}/captcha")]
 pub async fn get_captcha(form_host: web::Path<String>) -> Result<HttpResponse, ServerError> {
 

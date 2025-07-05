@@ -10,7 +10,7 @@ mod templates;
 use actix_web::{App, HttpServer};
 
 use crate::config::methods::{load_config, read_config};
-use crate::handlers::{get_captcha, post_form};
+use crate::handlers::{health, get_captcha, post_form};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -35,6 +35,7 @@ async fn main() -> std::io::Result<()> {
         let mut app = App::new();
 
         app = app
+            .service(health)
             .service(get_captcha)
             .service(post_form);
         
@@ -48,7 +49,8 @@ async fn main() -> std::io::Result<()> {
         {
             use actix_files::Files;
             use crate::config::global::ASSETS_FOLDER;
-            app = app.service(Files::new("/", ASSETS_FOLDER).index_file("test-form.html"));
+            // should return 404
+            app = app.service(Files::new("/", ASSETS_FOLDER).index_file("index.html"));
         }
 
         
