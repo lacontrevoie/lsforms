@@ -1,5 +1,5 @@
 # Do not edit that line unless you know what you are doing.
-config_version = 1
+config_version = 2
 
 [general]
 
@@ -51,3 +51,7 @@ contact_spam = "contact@my-org.example.org"
 
 # Mail signature used in sent form submissions to form webmasters.
 mail_signature = "My Org - https://my-org.example.org"
+
+# If set to true, if the form data contains a field named email,
+# the field is used as a reply-to address.
+set_reply_to = true

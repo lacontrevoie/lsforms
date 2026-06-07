@@ -5,7 +5,7 @@ use regex::Regex;
 
 pub const CONFIG_FILE: &str = "./config.toml";
 
-pub const CONFIG_VERSION: u8 = 1;
+pub const CONFIG_VERSION: u8 = 2;
 
 pub static CONFIG: OnceCell<Config> = OnceCell::new();
 

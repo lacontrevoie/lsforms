@@ -27,7 +27,8 @@ pub async fn gen_tpl(form_host: web::Path<String>) -> Result<HttpResponse, Serve
 
     Ok(HttpResponse::Ok()
         .content_type(ContentType::html())
-        .body(FormTemplate { config: &config, hostname: &host_name, host: &host_config }.render().expect("TODO"))
+        .body(FormTemplate { config: &config, hostname: &host_name, host: &host_config }.render()
+        .map_err(|e| throw(EK::TemplateRenderFail, format!("could not render form template for {host_name}: {e}")))?)
     )
 
 }

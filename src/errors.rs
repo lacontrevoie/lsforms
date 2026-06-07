@@ -28,6 +28,8 @@ pub enum ErrorKind {
     EmailToParseFail,
     EmailFromParseFail,
     NoClientIP,
+    #[cfg(feature = "templates")]
+    TemplateRenderFail,
 
     // warn/client-side errors: 200 -> 299
     UnknownHost = 200,

@@ -30,6 +30,7 @@ pub struct ConfMail {
     pub send_as: String,
     pub contact_spam: String,
     pub mail_signature: String,
+    pub set_reply_to: bool,
 }
 
 #[derive(Deserialize)]

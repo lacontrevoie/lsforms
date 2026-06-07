@@ -48,7 +48,7 @@ pub async fn deliver(
         .replace("{{/SUBJECT}}", "");
 
     // build the message body and headers
-    let m =
+    let mut m =
         Message::builder()
             .from(
                 config.mail.send_as.parse().map_err(|e: AddressError| {
@@ -63,12 +63,19 @@ pub async fn deliver(
                     throw(EK::EmailToParseFail, e.to_string())
                 })?)
             .subject(subject)
-            .header(ContentType::TEXT_PLAIN)
-            .body(mail_body)
-            .map_err(|e| {
-                dbg_print_form(config, form_values.clone());
-                throw(EK::EmailBodyParseFail, e.to_string())
-            })?;
+            .header(ContentType::TEXT_PLAIN);
+
+    // set reply-to if conditions are met
+    if config.mail.set_reply_to && let Some(rep) = form_values.get("email")
+    && let Ok(rep_mail) = rep.parse() {
+        m = m.reply_to(rep_mail);
+    }
+
+    let m_ready = m.body(mail_body)
+    .map_err(|e| {
+        dbg_print_form(config, form_values.clone());
+        throw(EK::EmailBodyParseFail, e.to_string())
+    })?;
 
     // build the mail server credentials
     let creds = Credentials::new(
@@ -88,7 +95,7 @@ pub async fn deliver(
     
     // Send the email
     mailer
-        .send(m)
+        .send(m_ready)
         .await
         .map_err(|e| {
             dbg_print_form(config, form_values.clone());
