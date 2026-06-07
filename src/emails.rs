@@ -40,8 +40,8 @@ pub async fn deliver(
         .replace("{{HOST}}", host_name)
         .replace("{{IP}}", client_ip)
         .replace("{{FORMDATA}}", &form_data)
-        .replace("{{CONTACT}}", &config.mail.contact_spam)
-        .replace("{{MAIL_SIGNATURE}}", &config.mail.mail_signature);
+        .replace("{{MAIL_SIGNATURE}}", &config.mail.mail_signature)
+        .replace("{{CONTACT}}", &config.mail.contact_spam);
 
     let subject = subject
         .replace("{{SUBJECT}}", "")
