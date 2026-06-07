@@ -35,7 +35,7 @@
         {%- endmatch -%}
     {%- endfor %}
     <p>
-        <altcha-widget challengeurl="{{ config.general.hostname }}/{{ hostname }}/captcha" hidefooter></altcha-widget>
+        <altcha-widget challenge="{{ config.general.hostname }}/{{ hostname }}/captcha" language="{{ host.language }}" configuration='{ "hideFooter": true }'></altcha-widget>
     </p>
     <p>
         <input name="lcv-form-submit" type="submit" id="lcv-form-submit" class="wp-block-button__link wp-element-button" value="Envoyer" />
