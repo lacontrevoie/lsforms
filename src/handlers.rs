@@ -1,8 +1,9 @@
 use actix_web::{get, post, web, HttpRequest, HttpResponse};
 use serde_json::Value;
-use altcha_lib_rs::{create_challenge, ChallengeOptions, verify_json_solution};
+use altcha_lib_rs::{Payload, create_challenge, ChallengeOptions, verify_json_solution};
 use chrono::Utc;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::sync::Mutex;
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
 use regex::Regex;
@@ -58,7 +59,12 @@ pub async fn get_captcha(form_host: web::Path<String>) -> Result<HttpResponse, S
 }
 
 #[post("/{host}/send")]
-pub async fn post_form(form_host: web::Path<String>, form: web::Form<Value>, req: HttpRequest) -> Result<HttpResponse, ServerError> {
+pub async fn post_form(
+    form_host: web::Path<String>,
+    form: web::Form<Value>,
+    req: HttpRequest,
+    seen_hashes: web::Data<Mutex<HashSet<String>>>
+) -> Result<HttpResponse, ServerError> {
 
     let config = load_config();
     let hosts = load_hosts();
@@ -88,10 +94,31 @@ pub async fn post_form(form_host: web::Path<String>, form: web::Form<Value>, req
             dbg_print_form(config, form_values.clone());
             throw(EK::CaptchaPayloadUtf8Fail, format!("payload utf8 decoding failed for {host_name}: {e}"))
         })?;
+
+        // check the captcha solution and expiration time
         verify_json_solution(string_payload, &config.captcha.secret, true).map_err(|_| {
             dbg_print_form(config, form_values.clone());
             throw(EK::CaptchaResultInvalid, format!("captcha result is invalid for {host_name}"))
         })?;
+
+        // add the captcha to our seen hashes db
+        // so we won't validate the same captcha twice
+        let payload: Payload = serde_json::from_str(string_payload).map_err(|_| {
+            dbg_print_form(config, form_values.clone());
+            throw(EK::CaptchaPayloadSerialFail, format!("couldn't deserialize captcha for {host_name}"))
+        })?;
+
+        let mut u_seen_hashes = seen_hashes.lock().map_err(|_| {
+            dbg_print_form(config, form_values.clone());
+            throw(EK::HashesDBLockFail, format!("could not lock mutex for {host_name}"))
+        })?;
+
+        // insert on HashSet returns 0 if the value is already in
+        if !u_seen_hashes.insert(payload.signature) {
+            dbg_print_form(config, form_values.clone());
+            return Err(throw(EK::CaptchaReplayed, format!("Same captcha result sent twice for {host_name}")));
+        }
+
     } else if form_values.contains_key("altcha") {
         // if captcha is disabled but form values contains captcha… it’s weird
         dbg_print_form(config, form_values.clone());

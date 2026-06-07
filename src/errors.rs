@@ -28,6 +28,7 @@ pub enum ErrorKind {
     EmailToParseFail,
     EmailFromParseFail,
     NoClientIP,
+    HashesDBLockFail,
     #[cfg(feature = "templates")]
     TemplateRenderFail,
 
@@ -37,8 +38,10 @@ pub enum ErrorKind {
     CaptchaFieldMissing,
     CaptchaPayloadB64Fail,
     CaptchaPayloadUtf8Fail,
+    CaptchaPayloadSerialFail,
     CaptchaResultInvalid,
     CaptchaFoundButDisabled,
+    CaptchaReplayed,
     FormDataNotObject,
     FormParamNotString,
     FieldSelectWrongType,

@@ -29,7 +29,7 @@ secret = "C H A N G E   M E"
 complexity = 500000
 
 # Captcha validity time in minutes.
-expires = 120
+expires = 45
 
 [mail]
 

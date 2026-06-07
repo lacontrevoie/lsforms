@@ -8,6 +8,9 @@ mod handlers;
 mod templates;
 
 use actix_web::{App, HttpServer};
+use actix_web::web::Data;
+use std::sync::Mutex;
+use std::collections::HashSet;
 
 use crate::config::methods::{load_config, read_config};
 use crate::handlers::{health, get_captcha, post_form};
@@ -30,11 +33,14 @@ async fn main() -> std::io::Result<()> {
         config.general.listening_address,
         config.general.listening_port
     );
+    
+    let seen_hashes = Data::new(Mutex::new(HashSet::<String>::new()));
 
     HttpServer::new(move || {
         let mut app = App::new();
 
         app = app
+            .app_data(seen_hashes.clone())
             .service(health)
             .service(get_captcha)
             .service(post_form);
