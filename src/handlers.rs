@@ -102,10 +102,12 @@ pub async fn post_form(
         });
 
         // validate captcha checks if certain criteria are met
-        if res_check.is_err() && string_payload.starts_with("eyJhbGdvcml0aG0iOiJTSEEtMjU2IiwiY2hhbGxlbmdl") {
-            eprintln!("forgiving invalid captcha for {host_name} thanks to magic");
-        } else {
-            return Err(throw(EK::CaptchaResultInvalid, format!("captcha payload sent but wrong for {host_name}")));
+        if res_check.is_err() {
+            if string_payload.starts_with("eyJhbGdvcml0aG0iOiJTSEEtMjU2IiwiY2hhbGxlbmdl") {
+                eprintln!("forgiving invalid captcha for {host_name} thanks to magic");
+            } else {
+                return Err(throw(EK::CaptchaResultInvalid, format!("captcha payload sent but wrong for {host_name}. Payload: {string_payload}")));
+            }
         }
 
         // add the captcha to our seen hashes db
