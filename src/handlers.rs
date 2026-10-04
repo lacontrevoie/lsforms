@@ -108,24 +108,24 @@ pub async fn post_form(
             } else {
                 return Err(throw(EK::CaptchaResultInvalid, format!("captcha payload sent but wrong for {host_name}. Payload: {altcha_form_entry}")));
             }
-        }
+        } else {
+            // add the captcha to our seen hashes db
+            // so we won't validate the same captcha twice
+            let payload: Payload = serde_json::from_str(string_payload).map_err(|_| {
+                dbg_print_form(config, form_values.clone());
+                throw(EK::CaptchaPayloadSerialFail, format!("couldn't deserialize captcha for {host_name}"))
+            })?;
 
-        // add the captcha to our seen hashes db
-        // so we won't validate the same captcha twice
-        let payload: Payload = serde_json::from_str(string_payload).map_err(|_| {
-            dbg_print_form(config, form_values.clone());
-            throw(EK::CaptchaPayloadSerialFail, format!("couldn't deserialize captcha for {host_name}"))
-        })?;
+            let mut u_seen_hashes = seen_hashes.lock().map_err(|_| {
+                dbg_print_form(config, form_values.clone());
+                throw(EK::HashesDBLockFail, format!("could not lock mutex for {host_name}"))
+            })?;
 
-        let mut u_seen_hashes = seen_hashes.lock().map_err(|_| {
-            dbg_print_form(config, form_values.clone());
-            throw(EK::HashesDBLockFail, format!("could not lock mutex for {host_name}"))
-        })?;
-
-        // insert on HashSet returns 0 if the value is already in
-        if !u_seen_hashes.insert(payload.signature) {
-            dbg_print_form(config, form_values.clone());
-            return Err(throw(EK::CaptchaReplayed, format!("Same captcha result sent twice for {host_name}")));
+            // insert on HashSet returns 0 if the value is already in
+            if !u_seen_hashes.insert(payload.signature) {
+                dbg_print_form(config, form_values.clone());
+                return Err(throw(EK::CaptchaReplayed, format!("Same captcha result sent twice for {host_name}")));
+            }
         }
 
     } else if form_values.contains_key("altcha") {
